@@ -158,8 +158,13 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .piece{touch-action:none;flex:none}
 .piece svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 3px rgba(36,52,77,.35))}
 .piece path{stroke:#FFFFFF;stroke-width:1.5;vector-effect:non-scaling-stroke}
-.piece.drag{position:fixed;z-index:50}
-.piece.drag svg{filter:drop-shadow(0 10px 10px rgba(36,52,77,.4))}
+.piece{cursor:pointer;border-radius:14px;transition:transform .15s}
+.piece.sel{transform:scale(1.12);background:rgba(255,200,58,.35);box-shadow:0 0 0 4px var(--sun)}
+.piece.lifted{opacity:.25}
+.piece.floating{position:fixed;left:0;top:0;z-index:120;pointer-events:none}
+.hand{position:fixed;left:-24px;top:-10px;z-index:130;font-size:56px;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3))}
+#pzSvg{cursor:pointer}
+.piece.floating svg{filter:drop-shadow(0 10px 10px rgba(36,52,77,.4))}
 .piece.wobble{animation:wob .5s}
 .piece.wiggle{animation:wob .8s 3}
 .gh.blink{animation:blink .7s 5}
@@ -252,6 +257,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   <section class="view" id="puzzle" hidden>
     <div class="bar"><button class="homebtn" data-go="home" aria-label="おうちにもどる"><svg width="34" height="34" viewBox="0 0 24 24"><path fill="#8A63D2" d="M12 3l9 8h-2.5v9h-5v-6h-3v6h-5v-9H3z"/></svg></button><h1><span id="pzTitle">ちずパズル</span><span class="lv" id="pzLv"></span></h1><button class="mapbtn" id="pzBack" hidden>🗾 ちずへ</button><div class="stars"><span>★</span><span class="starN">0</span><span class="p3"><i></i><i></i><i></i></span></div></div>
     <div id="pzSelect"><div class="ovwrap"><svg id="ovSvg"></svg></div><p id="ovNote"></p></div>
+    <p class="hint" id="pzHint" hidden></p>
     <div id="pzArea" hidden><div class="board" id="board"></div><div class="dock" id="tray"></div></div>
   </section>
 
@@ -280,7 +286,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <div class="prow">かずのレベル<div class="seg" data-g="num" data-max="7"></div></div>
     <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="8"></div></div>
     <div class="prow">ちずパズルのレベル<div class="seg" data-g="puz" data-max="3"></div></div>
-    <p>かず（5問正解でレベルアップ）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。<br>めいろ（2回クリアでレベルアップ）：迷路が少しずつ大きくなり、レベル6からは⭐を集めてからゴール。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：色と名前のヒント、2：名前のヒントのみ、3：ヒントなし）。ほし3こでシール1枚。</p>
+    <p>かず（5問正解でレベルアップ）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。<br>めいろ（2回クリアでレベルアップ）：迷路が少しずつ大きくなり、レベル6からは⭐を集めてからゴール。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。ほし3こでシール1枚。</p>
     <div class="prow"><button class="pbtn danger" id="resetBtn">記録をリセット</button><button class="pbtn" id="closeParent">とじる</button></div>
   </div>
 </div>
@@ -527,7 +533,7 @@ function newPuzzle(){showSelect();}
 function showSelect(){
   clearTimeout(hintT);pz=null;
   if(!Array.isArray(state.mapDone))state.mapDone=[];
-  $('#pzSelect').hidden=false;$('#pzArea').hidden=true;$('#pzBack').hidden=true;$('#pzTitle').textContent='ちずパズル';
+  $('#pzSelect').hidden=false;$('#pzArea').hidden=true;$('#pzHint').hidden=true;$('#pzBack').hidden=true;$('#pzTitle').textContent='ちずパズル';
   const J=MAP.japan,svg=$('#ovSvg');svg.innerHTML='';svg.setAttribute('viewBox',J.vb.join(' '));
   svg.appendChild(el('rect',{x:J.inset[0],y:J.inset[1],width:J.inset[2],height:J.inset[3],rx:10,class:'inset'}));
   J.groups.forEach((g,i)=>{const done=state.mapDone.includes(g.id);
@@ -540,23 +546,23 @@ function showSelect(){
 }
 function startGroup(id){
   const G=MAP.groups[id],lv=Math.min(3,state.level.puz);
-  $('#pzSelect').hidden=true;$('#pzArea').hidden=false;$('#pzBack').hidden=false;$('#pzTitle').textContent=G.kana;
-  pz={id,G,lv,placed:0,total:G.pieces.length,queue:shuffle(G.pieces.slice()),ghost:{},labels:{}};
+  $('#pzSelect').hidden=true;$('#pzArea').hidden=false;$('#pzHint').hidden=false;$('#pzBack').hidden=false;$('#pzTitle').textContent=G.kana;
+  pz={sel:null,id,G,lv,placed:0,total:G.pieces.length,queue:shuffle(G.pieces.slice()),ghost:{},labels:{}};
   const board=$('#board');board.innerHTML='';board.classList.remove('done');
   const svg=el('svg',{viewBox:G.vb.join(' '),id:'pzSvg'});
   if(G.inset){const[x,y,w,h]=G.inset;svg.appendChild(el('rect',{x,y,width:w,height:h,rx:12,class:'inset'}));}
   G.pieces.forEach(p=>svg.appendChild(el('path',{d:p.d,fill:'#FFFFFF'})));
   G.pieces.forEach(p=>{const g=el('path',{d:p.d,class:'gh',style:lv===1?'fill:'+p.color+';fill-opacity:.32':'fill:var(--land)'});pz.ghost[p.id]=g;svg.appendChild(g);});
-  const gl=el('g',{});
-  if(lv<=2)G.pieces.forEach(p=>{const t=el('text',{x:p.lx,y:p.ly,class:'glbl','font-size':fsOf(p)});t.textContent=p.kana;pz.labels[p.id]=t;gl.appendChild(t);});
-  pz.gPlaced=el('g',{});pz.gLbl=el('g',{});svg.append(gl,pz.gPlaced,pz.gLbl);board.appendChild(svg);
-  $('#tray').innerHTML='';layoutPuzzle();fillDock();armHint();
+  pz.gPlaced=el('g',{});pz.gLbl=el('g',{});svg.append(pz.gPlaced,pz.gLbl);board.appendChild(svg);
+  svg.addEventListener('click',boardTap);
+  $('#tray').innerHTML='';layoutPuzzle();fillDock();selectPiece(null);armHint();
+  setTimeout(demo,700);
   say(G.kana+' の パズル だよ');
 }
 function pieceEl(p){
   const w=p.b[2]-p.b[0],h=p.b[3]-p.b[1];const d=document.createElement('div');d.className='piece';d.dataset.id=p.id;
   const s=el('svg',{viewBox:[p.b[0],p.b[1],w,h].join(' ')});s.appendChild(el('path',{d:p.d,fill:p.color}));
-  const t=el('text',{x:p.lx,y:p.ly,class:'plbl','font-size':fsOf(p)});t.textContent=p.kana;s.appendChild(t);d.appendChild(s);
+  if(pz.lv<3){const t=el('text',{x:p.lx,y:p.ly,class:'plbl','font-size':fsOf(p)});t.textContent=p.kana;s.appendChild(t);}d.appendChild(s);
   bindPiece(d,p);return d;
 }
 function fillDock(){
@@ -587,49 +593,88 @@ function sizeDock(){
 }
 function armHint(){clearTimeout(hintT);hintT=setTimeout(()=>{
   if(current!=='puzzle'||!pz||!$('#ov').hidden)return armHint();
-  const d=$('#tray .slot > .piece');if(!d)return;const g=pz.ghost[d.dataset.id];
+  const d=pz.sel||$('#tray .slot > .piece');if(!d)return;const g=pz.ghost[d.dataset.id];
   d.classList.remove('wiggle','wobble');void d.offsetWidth;d.classList.add('wiggle');
   g.classList.remove('blink');void g.getBBox();g.classList.add('blink');
   setTimeout(()=>{d.classList.remove('wiggle');g.classList.remove('blink');},3600);armHint();
 },10000);}
+function pieceOf(d){return pz.G.pieces.find(q=>q.id===d.dataset.id);}
+function selectPiece(d){
+  if(pz.sel)pz.sel.classList.remove('sel');
+  pz.sel=d;if(d){d.classList.add('sel');say(fullName(pieceOf(d)));sfx.tick();}
+  $('#pzHint').textContent=d?'ちずの どこに はまるかな？ タッチしてね':'ピースを タッチしてね';
+}
+/* x,y (画面座標) がピースの正しい場所か */
+function onTarget(p,x,y,slack){
+  const sr=$('#pzSvg').getBoundingClientRect(),s=pz.s;
+  const g=pz.ghost[p.id];
+  const hit=document.elementsFromPoint?document.elementsFromPoint(x,y):[document.elementFromPoint(x,y)];
+  if(hit.includes(g))return true;
+  const cx_=sr.left+(p.b[0]+p.b[2])/2*s,cy_=sr.top+(p.b[1]+p.b[3])/2*s;
+  return Math.hypot(x-cx_,y-cy_)<slack;
+}
+function placePiece(d,p){
+  const sr=$('#pzSvg').getBoundingClientRect(),s=pz.s;
+  const tcx=sr.left+(p.b[0]+p.b[2])/2*s,tcy=sr.top+(p.b[1]+p.b[3])/2*s;
+  if(pz.sel===d)selectPiece(null);
+  d.parentElement.remove();
+  pz.gPlaced.appendChild(el('path',{d:p.d,fill:p.color,class:'pl'}));
+  const t=el('text',{x:p.lx,y:p.ly,class:'lbl','font-size':fsOf(p)});t.textContent=p.kana;pz.gLbl.appendChild(t);
+  sfx.snap();burst(tcx,tcy,22,7,false);pz.placed++;armHint();
+  if(pz.placed===pz.total){clearTimeout(hintT);$('#board').classList.add('done');state.prog.puz++;
+    if(!state.mapDone.includes(pz.id))state.mapDone.push(pz.id);
+    let msg=pz.G.kana+' が かんせい！';
+    if(state.mapDone.length>=G_ORDER.length){state.mapDone=[];msg='にほんちずが ぜんぶ できたよ！';
+      if(state.level.puz<MAX.puz){state.level.puz++;msg+=' レベル '+state.level.puz+' に あがったよ！';}}
+    setTimeout(()=>celebrate('できた！',msg,showSelect),1300);
+  }else{say(p.kana+' ぴったり！');fillDock();}
+}
+function miss(d){
+  d.classList.remove('wobble','wiggle');void d.offsetWidth;d.classList.add('wobble');setTimeout(()=>d.classList.remove('wobble'),520);
+  sfx.ng();say('そこじゃ ないみたい');
+}
 function bindPiece(d,p){
-  let off=null,home=null;
+  let st=null,fl=null;
   d.addEventListener('pointerdown',e=>{
-    if(!d.isConnected||!$('#ov').hidden||!pz)return;
+    if(!d.isConnected||!$('#ov').hidden||!pz||st)return;
+    e.preventDefault();
     const r=d.getBoundingClientRect(),fw=(p.b[2]-p.b[0])*pz.s,fh=(p.b[3]-p.b[1])*pz.s;
-    home={w:d.style.width,h:d.style.height};
-    off=[(e.clientX-r.left)/r.width*fw,(e.clientY-r.top)/r.height*fh];
-    d.classList.add('drag');d.style.width=fw+'px';d.style.height=fh+'px';
-    d.style.left=(e.clientX-off[0])+'px';d.style.top=(e.clientY-off[1])+'px';
-    try{d.setPointerCapture(e.pointerId);}catch(_){}sfx.tick();say(fullName(p));e.preventDefault();
+    st={x:e.clientX,y:e.clientY,id:e.pointerId,moved:false,off:[(e.clientX-r.left)/r.width*fw,(e.clientY-r.top)/r.height*fh],fw,fh};
+    const mv=ev=>{if(!st||ev.pointerId!==st.id)return;ev.preventDefault();
+      if(!st.moved&&Math.hypot(ev.clientX-st.x,ev.clientY-st.y)>10){
+        st.moved=true;fl=d.cloneNode(true);fl.className='piece floating';fl.style.width=st.fw+'px';fl.style.height=st.fh+'px';
+        document.body.appendChild(fl);d.classList.add('lifted');sfx.tick();}
+      if(fl){fl.style.left=(ev.clientX-st.off[0])+'px';fl.style.top=(ev.clientY-st.off[1])+'px';}};
+    const up=ev=>{if(!st||ev.pointerId!==st.id)return;
+      window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+      const moved=st.moved;st=null;
+      if(!moved){selectPiece(pz.sel===d?null:d);return;}
+      const fr=fl.getBoundingClientRect();fl.remove();fl=null;d.classList.remove('lifted');
+      if(ev.type==='pointercancel')return;
+      const cx_=fr.left+fr.width/2,cy_=fr.top+fr.height/2,slack=Math.max(60,0.45*Math.min(fr.width,fr.height));
+      if(onTarget(p,ev.clientX,ev.clientY,slack)||onTarget(p,cx_,cy_,slack))placePiece(d,p);
+      else{const sr=$('#pzSvg').getBoundingClientRect();if(cx_>sr.left&&cx_<sr.right&&cy_>sr.top&&cy_<sr.bottom)miss(d);}
+    };
+    window.addEventListener('pointermove',mv,{passive:false});window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
   });
-  d.addEventListener('pointermove',e=>{if(!off)return;d.style.left=(e.clientX-off[0])+'px';d.style.top=(e.clientY-off[1])+'px';e.preventDefault();});
-  const end=()=>{
-    if(!off)return;off=null;
-    const r=d.getBoundingClientRect(),sr=$('#pzSvg').getBoundingClientRect(),s=pz.s;
-    const tcx=sr.left+(p.b[0]+p.b[2])/2*s,tcy=sr.top+(p.b[1]+p.b[3])/2*s;
-    const cx_=r.left+r.width/2,cy_=r.top+r.height/2,tol=Math.max(50,0.45*Math.min(r.width,r.height));
-    d.classList.remove('drag');d.style.left='';d.style.top='';
-    if(Math.hypot(cx_-tcx,cy_-tcy)<tol){
-      d.parentElement.remove();
-      pz.gPlaced.appendChild(el('path',{d:p.d,fill:p.color,class:'pl'}));
-      if(pz.labels[p.id])pz.labels[p.id].remove();
-      const t=el('text',{x:p.lx,y:p.ly,class:'lbl','font-size':fsOf(p)});t.textContent=p.kana;pz.gLbl.appendChild(t);
-      sfx.snap();burst(tcx,tcy,22,7,false);pz.placed++;armHint();
-      if(pz.placed===pz.total){clearTimeout(hintT);$('#board').classList.add('done');state.prog.puz++;
-        if(!state.mapDone.includes(pz.id))state.mapDone.push(pz.id);
-        let msg=pz.G.kana+' が かんせい！';
-        if(state.mapDone.length>=G_ORDER.length){state.mapDone=[];msg='にほんちずが ぜんぶ できたよ！';
-          if(state.level.puz<MAX.puz){state.level.puz++;msg+=' レベル '+state.level.puz+' に あがったよ！';}}
-        setTimeout(()=>celebrate('できた！',msg,showSelect),1300);
-      }else{say('ぴったり！');fillDock();}
-    }else{
-      d.style.width=home.w;d.style.height=home.h;
-      d.classList.remove('wobble','wiggle');void d.offsetWidth;d.classList.add('wobble');setTimeout(()=>d.classList.remove('wobble'),520);
-      if(cx_>sr.left&&cx_<sr.right&&cy_>sr.top&&cy_<sr.bottom){sfx.ng();say('そこじゃ ないみたい');}
-    }
-  };
-  d.addEventListener('pointerup',end);d.addEventListener('pointercancel',end);
+}
+function boardTap(e){
+  if(!pz||!$('#ov').hidden)return;
+  if(!pz.sel){const d=$('#tray .slot > .piece');if(d){d.classList.remove('wiggle');void d.offsetWidth;d.classList.add('wiggle');setTimeout(()=>d.classList.remove('wiggle'),2400);}
+    say('さきに ピースを タッチしてね');return;}
+  const d=pz.sel,p=pieceOf(d);
+  if(onTarget(p,e.clientX,e.clientY,Math.max(50,0.35*Math.min((p.b[2]-p.b[0])*pz.s,(p.b[3]-p.b[1])*pz.s))))placePiece(d,p);else miss(d);
+}
+/* はじめての ときの おてほん */
+function demo(){
+  if(RM||!pz)return;const d=$('#tray .slot > .piece');if(!d)return;const p=pieceOf(d);
+  const r=d.getBoundingClientRect(),sr=$('#pzSvg').getBoundingClientRect(),s=pz.s;
+  const x0=r.left+r.width/2,y0=r.top+r.height/2,x1=sr.left+(p.b[0]+p.b[2])/2*s,y1=sr.top+(p.b[1]+p.b[3])/2*s;
+  const h=document.createElement('div');h.className='hand';h.textContent='👆';document.body.appendChild(h);
+  const a=h.animate([{transform:`translate(${x0}px,${y0}px) scale(1)`,opacity:0},{transform:`translate(${x0}px,${y0}px) scale(1)`,opacity:1,offset:.15},
+    {transform:`translate(${x0}px,${y0}px) scale(.8)`,offset:.3},{transform:`translate(${x1}px,${y1}px) scale(.8)`,offset:.75},
+    {transform:`translate(${x1}px,${y1}px) scale(1)`,opacity:1,offset:.9},{transform:`translate(${x1}px,${y1}px) scale(1)`,opacity:0}],{duration:2600,iterations:2});
+  a.onfinish=()=>h.remove();document.addEventListener('pointerdown',()=>{try{a.cancel();}catch(_){}h.remove();},{once:true});
 }
 
 $('#pzBack').onclick=()=>showSelect();
@@ -650,7 +695,6 @@ $('#resetBtn').onclick=e=>{const b=e.currentTarget;
   b.dataset.armed='';state={mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:state.sound};save();refresh();paintParent();b.textContent='リセットしました';};
 
 refresh();
-/* 全画面・画面スリープ防止・オフライン */
 const fsEl=document.documentElement,fsReq=fsEl.requestFullscreen||fsEl.webkitRequestFullscreen;
 const isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
 const standalone=window.matchMedia&&matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;

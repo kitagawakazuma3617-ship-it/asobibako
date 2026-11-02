@@ -138,6 +138,18 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .spinner small{font-size:16px;font-weight:800;color:var(--soft)}
 .spinner.done{opacity:.55}
 .spinner.spinning .dots{animation:wob .3s infinite}
+.items.frames{display:flex;flex-wrap:wrap;gap:14px 22px;justify-content:center;align-content:center;--cell:clamp(44px,min(10vmin,7.4vw),90px)}
+@media (orientation:portrait){.items.frames{flex-direction:column;align-items:center;--cell:clamp(44px,min(9vw,5.5vh),90px)}}
+.fr{display:grid;grid-template-columns:repeat(5,var(--cell));grid-auto-rows:var(--cell);gap:6px 8px}
+.frames .item{width:100%;height:100%;font-size:calc(var(--cell)*.62)}
+.frames .cell,.frame .cell{border-radius:16px;border:3px dashed var(--line)}
+.cell.cnt{background:#FFF3D6;border-color:var(--sun);display:grid;place-items:center;font-weight:800;font-size:calc(var(--cell)*.4);color:var(--tomato)}
+.item.hide span:first-child{visibility:hidden}
+.item.hide{background:var(--sky)}
+.choice.big2{width:auto;min-width:clamp(140px,22vw,200px);padding:0 24px}
+.typeCmp .items,.typeMath .items{display:none}
+.typeMath .choices{flex:1;align-items:center}
+.typeCmp .choices{flex:1;align-items:center;gap:40px}
 .typeB .items{display:none}
 .typeB .choices{flex:1;align-items:center}
 .card{animation:popin .4s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*90ms);flex:1 1 180px;max-width:280px;min-height:170px;border-radius:28px;background:var(--paper);box-shadow:0 6px 0 var(--line);
@@ -329,7 +341,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <h2>おうちのかたへ</h2>
     <p>あそんだ記録（ほし・シール・レベル）は、このタブレットのブラウザの中にだけ保存されます。ブラウザのデータを消すと記録も消えます。</p>
     <div class="prow">おと・こえ<div class="seg" id="sndSeg"><button data-v="1">ON</button><button data-v="0">OFF</button></div></div>
-    <div class="prow">かずのレベル<div class="seg" data-g="num" data-max="7"></div></div>
+    <div class="prow">かずのレベル<div class="seg" data-g="num" data-max="15"></div></div>
     <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="20"></div></div>
     <div class="prow">ちずパズルのレベル<div class="seg" data-g="puz" data-max="3"></div></div>
     <div class="prow">1日にあそぶ時間<div class="seg" id="limSeg"><button data-v="0">なし</button><button data-v="15">15分</button><button data-v="30">30分</button><button data-v="45">45分</button><button data-v="60">60分</button></div></div>
@@ -340,12 +352,12 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
         <li>となりで「いくつだった？」「どっちに いく？」と声をかけるだけで、学びの効果が大きくなります（子どもだけで使うより、大人と一緒のほうが効果が高いという研究結果があります）。</li>
         <li>「みぎ・ひだり・うえ・した・となり・あいだ」など、位置のことばを口に出してあげてください。こうしたことばを多く聞いた子ほど、図形や空間の力が伸びやすいことが分かっています。</li>
         <li>数え終わったら「ぜんぶで いくつ？」と聞いてみてください。最後に言った数が全体の数だと分かることが、数の理解の土台です。</li>
-        <li>すうじレースでは、ますの数字を子どもに声に出して言ってもらうと効果的です。</li>
+        <li>本物のすごろく（1〜100のマスが一列に並んだもの）を大人と一緒に遊ぶと、数の大小の感覚が育つという研究があります。画面よりも、おうちで遊ぶのがおすすめです。</li>
         <li>ほめるときは「てんさい」より「よく見てたね」「さいごまで やったね」と、やり方や頑張りをほめるほうが、難しいことに挑む気持ちが育ちます。</li>
         <li>1回15〜20分くらい、毎日少しずつのほうが身につきやすいです。</li>
       </ul>
     </details>
-    <p>かず（5問正解でレベルアップ。2回つまずくと一緒に数える助けが入り、それが続くとレベルが1つ下がります）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。レベル2から「○こ とって」と「すうじレース（1〜10のすごろく）」も出ます。<br>めいろ（すんなりクリアが2回でレベルアップ。12秒止まると矢印と「みぎ・ひだり」のことばでヒントが出ます。ヒントが続くとレベルが1つ下がります）：レベルが上がるほど分かれ道と行き止まりが増え、ゴールに近づくように見える間違った道も入ります。レベル7からは行き止まりの奥にある⭐を集めてからゴール、レベル9からは⭐を番号順に集めます。レベル11からは🔑で🚪を開ける仕掛け（15からは色ちがいの鍵が2つ）、レベル13からは最初の5秒だけ迷路が見えて、その後は周りしか見えない「くらやみ」が加わります（通った場所は薄く見えたまま）。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。地方が完成すると、名前を聞いて場所を探す「どこかな？」が2〜4問出ます（間違えても減点はありません）。「おうちの ある 都道府県」を選ぶと、その県に🏠が付きます。ほし3こでシール1枚。</p>
+    <p>かず（5問正解でレベルアップ。2回つまずくと一緒に数える助けが入り、それが続くとレベルが1つ下がります）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）、8 ぱっと見て数をつかむ、9 あといくつで10、10 たし算（20まで・くり上がり）、11 ひき算（20まで）、12 2・5・10ずつ数える、13 2けたの大小、14 数字だけで計算、15 3つの数の計算。レベル8からは前のレベルの問題も復習で混ざり、選択肢が4つになります。レベル2〜5では「○こ とって」も出ます。<br>めいろ（すんなりクリアが2回でレベルアップ。12秒止まると矢印と「みぎ・ひだり」のことばでヒントが出ます。ヒントが続くとレベルが1つ下がります）：レベルが上がるほど分かれ道と行き止まりが増え、ゴールに近づくように見える間違った道も入ります。レベル7からは行き止まりの奥にある⭐を集めてからゴール、レベル9からは⭐を番号順に集めます。レベル11からは🔑で🚪を開ける仕掛け（15からは色ちがいの鍵が2つ）、レベル13からは最初の5秒だけ迷路が見えて、その後は周りしか見えない「くらやみ」が加わります（通った場所は薄く見えたまま）。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。地方が完成すると、名前を聞いて場所を探す「どこかな？」が2〜4問出ます（間違えても減点はありません）。「おうちの ある 都道府県」を選ぶと、その県に🏠が付きます。ほし3こでシール1枚。</p>
     <div class="prow"><button class="pbtn danger" id="resetBtn">記録をリセット</button><button class="pbtn" id="closeParent">とじる</button></div>
   </div>
 </div>
@@ -355,7 +367,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 const KEY='asobibako-v1';
 const STICKERS=['🦁','🐼','🦒','🐘','🦖','🚒','🚀','🌈','🍉','🍦','🐳','🦄','🚂','🐞','🦋','🌻','🍰','🚜','🐙','🦊','🎈','⛄','🐸','🚁'];
 const ITEMS=['🍎','🍓','🐟','🚗','⭐','🐤','🍩','🌷','🍌','🐞'];
-const MAX={num:7,maze:20,puz:3};
+const MAX={num:15,maze:20,puz:3};
 let state={limit:0,playDay:'',playSec:0,extra:0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){state=Object.assign(state,s);state.level=Object.assign({num:1,maze:1,puz:1},s.level);state.prog=Object.assign({num:0,maze:0,puz:0},s.prog);}}catch(e){}
 if(state.level.puz>3)state.level.puz=3;
@@ -459,8 +471,7 @@ $('#ovHome').onclick=()=>{clearTimeout(ovT);$('#ov').hidden=true;show('home');};
 
 /* ---------- かず ---------- */
 let nq=null;
-const RACE_COL=['#F2614B','#FFB33A','#2FAE7E','#5AA9E6','#8A63D2','#E8619A','#43B7C2','#9BC53D','#F28C3A','#F2614B'];
-function choicesFor(ans,lo,hi){const s=new Set([ans]);for(const v of shuffle([ans-2,ans-1,ans+1,ans+2].filter(v=>v>=lo&&v<=hi))){if(s.size>=3)break;s.add(v);}while(s.size<3)s.add(lo+rand(hi-lo+1));return shuffle([...s]);}
+function choicesFor(ans,lo,hi,n=3){const s=new Set([ans]);for(const v of shuffle([ans-2,ans-1,ans+1,ans+2,ans-10,ans+10].filter(v=>v>=lo&&v<=hi))){if(s.size>=n)break;s.add(v);}while(s.size<n)s.add(lo+rand(hi-lo+1));return shuffle([...s]);}
 function shakeEl(b){b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');}
 function pulseEl(b){if(!b)return;b.classList.add('hintpulse');}
 function clearPulse(){document.querySelectorAll('.hintpulse').forEach(b=>b.classList.remove('hintpulse'));}
@@ -468,22 +479,32 @@ function pulseChoice(v){pulseEl([...document.querySelectorAll('#numChoices [data
 /* ものを1つずつタッチして数える（1対1対応） */
 function itemBtn(emo,i,cls,onTap){const b=document.createElement('button');b.className='item'+(cls?' '+cls:'');b.style.setProperty('--i',i);b.innerHTML='<span>'+emo+'</span><span class="badge"></span>';
   b.onclick=()=>{if(nq.lock)return;(onTap||countTap)(b);};return b;}
-function countTap(b){if(b.classList.contains('on')||b.classList.contains('gone'))return;nq.count++;b.classList.add('on');b.lastChild.textContent=nq.count;sfx.step(nq.count);const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,8,4,false);say(String(nq.count));}
+function countTap(b){if(b.classList.contains('on')||b.classList.contains('gone')||b.classList.contains('hide'))return;nq.count++;b.classList.add('on');b.lastChild.textContent=nq.count;sfx.step(nq.count);const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,8,4,false);say(String(nq.count));}
 /* 「○こ とって」：えらんだ順に番号がつく */
 function pickTap(b){const k=nq.picked.indexOf(b);if(k>=0){nq.picked.splice(k,1);b.classList.remove('on');b.lastChild.textContent='';}else{nq.picked.push(b);b.classList.add('on');}
   nq.picked.forEach((x,i)=>x.lastChild.textContent=i+1);if(k<0){sfx.step(nq.picked.length);say(String(nq.picked.length));}}
-/* 10のまとまり（テンフレーム）に ならべる */
-function tenFrame(items,fill){items.classList.add('frame');for(let i=0;i<10;i++){const e=fill(i);if(e)items.appendChild(e);else{const c=document.createElement('div');c.className='cell';items.appendChild(c);}}}
+/* 10のまとまり（テンフレーム）。20までは 2つならべる */
+function fillFrame(box,start,fill){for(let i=start;i<start+10;i++){const e=fill(i);if(e)box.appendChild(e);else{const c=document.createElement('div');c.className='cell';box.appendChild(c);}}}
+function tenFrame(items,fill,total=10){
+  if(total<=10){items.classList.add('frame');fillFrame(items,0,fill);return;}
+  items.classList.add('frames');for(let f=0;f<2;f++){const box=document.createElement('div');box.className='fr';fillFrame(box,f*10,fill);items.appendChild(box);}
+}
+const LV_NAME=['','かぞえる 1〜3','かぞえる 1〜5','かぞえる 1〜10','たしざん 5まで','たしざん 10まで','ひきざん 10まで','かずの じゅんばん',
+  'ぱっと みて いくつ？','10を つくろう','たしざん 20まで','ひきざん 20まで','とびとびに かぞえる','おおきい のは どっち？','すうじだけで けいさん','3つの かずの けいさん'];
 function pickType(lv){const r=Math.random();
   if(lv===1)return 'A';
-  if(lv<=3)return r<.4?'A':r<.6?'B':r<.8?'GIVE':'RACE';
-  if(lv<=5)return r<.55?'ADD':r<.65?'A':r<.8?'GIVE':'RACE';
-  if(lv===6)return r<.65?'SUB':r<.85?'ADD':'RACE';
-  return r<.6?'SEQ':r<.85?'SUB':'RACE';}
+  if(lv<=3)return r<.5?'A':r<.75?'B':'GIVE';
+  if(lv<=5)return r<.65?'ADD':r<.8?'A':'GIVE';
+  if(lv===6)return r<.7?'SUB':'ADD';
+  if(lv===7)return r<.7?'SEQ':'SUB';
+  // 8以上：その レベルの 新しい問題が 中心、前の問題も ときどき（ふくしゅう）
+  const main={8:'FLASH',9:'MAKE10',10:'ADD20',11:'SUB20',12:'SKIP',13:'CMP',14:'MATH',15:'THREE'}[lv];
+  const prev=['FLASH','MAKE10','ADD20','SUB20','SKIP','CMP','MATH'].slice(0,Math.max(1,lv-8));
+  return r<.7?main:prev[rand(prev.length)];}
 function newNum(){
   const lv=state.level.num,type=window.__forceType||pickType(lv);
-  const emo=ITEMS[rand(ITEMS.length)];
-  const view=$('#numbers');view.classList.toggle('typeB',type==='B');view.classList.toggle('typeRace',type==='RACE');
+  const emo=ITEMS[rand(ITEMS.length)],nOpt=lv>=10?4:3;
+  const view=$('#numbers');view.classList.toggle('typeB',type==='B');view.classList.toggle('typeCmp',type==='CMP');view.classList.toggle('typeMath',type==='MATH'||type==='THREE');
   const items=$('#numItems'),ch=$('#numChoices');items.innerHTML='';ch.innerHTML='';items.className='items';
   let ans,choices=null,prompt,talk;
   nq={type,count:0,lock:false,miss:0,guided:false,picked:[]};
@@ -503,7 +524,7 @@ function newNum(){
     const bs=[];tenFrame(items,i=>{if(i>=n)return null;const b=itemBtn(emo,i);bs.push(b);return b;});
     setTimeout(()=>bs.slice(n-m).forEach(b=>b.classList.add('gone')),1100);
   }else if(type==='SEQ'){
-    const s=1+rand(17),miss=1+rand(3);ans=s+miss;choices=choicesFor(ans,1,20);nq.seqStart=s;
+    const s=1+rand(17),miss=1+rand(3);ans=s+miss;choices=choicesFor(ans,1,20);nq.seq=[s,s+1,s+2,s+3];
     prompt='？に はいる かずは？';talk='はてなに はいる かずは なにかな';
     for(let i=0;i<4;i++){const d=document.createElement('div');d.className='seq'+(i===miss?' q':'');d.style.setProperty('--i',i);d.textContent=i===miss?'？':s+i;items.appendChild(d);}
   }else if(type==='GIVE'){
@@ -511,16 +532,50 @@ function newNum(){
     prompt=emo+' を <span class="bignum">'+ans+'</span>こ とって';talk=ans+' こ とってね。とったら できた を おしてね';
     for(let i=0;i<total;i++)items.appendChild(itemBtn(emo,i,'',pickTap));
     const ok=document.createElement('button');ok.className='choice okbtn';ok.id='giveBtn';ok.textContent='できた！';ok.onclick=()=>checkNum(nq.picked.length,ok);ch.appendChild(ok);
-  }else{ // RACE：1から10まで すすむ すごろく
-    ans=10;prompt='<span class="bignum">1</span>から<span class="bignum">10</span>まで すすもう！';talk='まわして、でた かずだけ すすもう。10 まで いけるかな';
-    buildRace(items,ch,lv);
+  }else if(type==='FLASH'){ // ぱっと見て数をつかむ（5と10のまとまりで見る）
+    ans=3+rand(8);choices=choicesFor(ans,1,10,nOpt);const ms=Math.max(900,1600-(lv-8)*100);
+    prompt='ぱっと みて いくつ？';talk='よく みててね。ぱっと きえるよ';
+    const shown=new Set(ans>5&&Math.random()<.5?[...Array(ans).keys()]:shuffle([...Array(10).keys()]).slice(0,ans));
+    tenFrame(items,i=>shown.has(i)?itemBtn(emo,i):null);
+    const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;items.querySelectorAll('.item').forEach(b=>b.classList.add('hide'));nq.lock=false;say('いくつ だった？',true);},800+ms);
+  }else if(type==='MAKE10'){ // あと いくつで 10？
+    const a=1+rand(9);ans=10-a;choices=choicesFor(ans,1,9,nOpt);
+    prompt='あと いくつで <span class="bignum">10</span>？';talk=a+' こ あるよ。あと いくつで 10 に なるかな';
+    tenFrame(items,i=>i<a?itemBtn(emo,i):null);
+  }else if(type==='ADD20'){ // くりあがり：10の まとまりを つくって 考える
+    const a=4+rand(6),bb=11-a+rand(a-1);ans=a+bb;choices=choicesFor(ans,10,20,nOpt);
+    prompt=a+' ＋ '+bb+' は いくつ？';talk=a+' たす '+bb+' は いくつ';
+    tenFrame(items,i=>i<a?itemBtn(emo,i):i<a+bb?itemBtn(emo,i,'g2'):null,20);
+  }else if(type==='SUB20'){
+    const n=11+rand(9),m=2+rand(Math.min(8,n-2));ans=n-m;choices=choicesFor(ans,1,18,nOpt);
+    prompt=n+' － '+m+' は いくつ？';talk=n+' ひく '+m+' は いくつ';
+    const bs=[];tenFrame(items,i=>{if(i>=n)return null;const b=itemBtn(emo,i);bs.push(b);return b;},20);
+    setTimeout(()=>bs.slice(n-m).forEach(b=>b.classList.add('gone')),1100);
+  }else if(type==='SKIP'){ // 2ずつ・5ずつ・10ずつ
+    const st=[2,5,10][rand(3)],s0=st*rand(st===10?5:st===5?6:8),miss=1+rand(3);const seq=[0,1,2,3].map(i=>s0+st*i);ans=seq[miss];nq.seq=seq;nq.step=st;
+    choices=choicesFor(ans,0,100,nOpt);if(!choices.includes(ans+st)&&ans+st<=100){choices[choices.findIndex(v=>v!==ans)]=ans+st;}
+    prompt=st+' ずつ ふえるよ。？は？';talk=st+' ずつ ふえるよ。はてなに はいる かずは';
+    for(let i=0;i<4;i++){const d=document.createElement('div');d.className='seq'+(i===miss?' q':'');d.style.setProperty('--i',i);d.textContent=i===miss?'？':seq[i];items.appendChild(d);}
+  }else if(type==='CMP'){ // 2けたの 大小
+    let a=10+rand(90),b=10+rand(90);if(Math.random()<.5){b=(a%10)*10+((a/10)|0);if(b<10||b===a)b=a+(rand(2)?1:-1)*(1+rand(9));}if(b===a)b=a+1;b=Math.max(10,Math.min(99,b));if(b===a)b=a-1;
+    ans=Math.max(a,b);choices=shuffle([a,b]);nq.pair=[a,b];
+    prompt='おおきい かずは どっち？';talk='おおきい かずは どっちかな';
+  }else if(type==='MATH'){ // 絵なしで あたまの中で
+    const plus=Math.random()<.5;let a,b;
+    if(plus){a=2+rand(9);b=2+rand(Math.min(9,20-a-1));ans=a+b;}else{a=8+rand(12);b=2+rand(Math.min(9,a-2));ans=a-b;}
+    choices=choicesFor(ans,0,20,nOpt);nq.expr=[a,plus,b];
+    prompt='<span class="bignum">'+a+'</span> '+(plus?'＋':'－')+' <span class="bignum">'+b+'</span> ＝ ？';talk=a+(plus?' たす ':' ひく ')+b+' は';
+  }else{ // THREE：3つの かず
+    const a=2+rand(7),b=2+rand(7),plus2=Math.random()<.5;const c=plus2?1+rand(Math.max(1,20-a-b)):1+rand(a+b-1);ans=plus2?a+b+c:a+b-c;
+    choices=choicesFor(ans,0,20,nOpt);nq.expr3=[a,b,c,plus2];
+    prompt='<span class="bignum">'+a+'</span> ＋ <span class="bignum">'+b+'</span> '+(plus2?'＋':'－')+' <span class="bignum">'+c+'</span> ＝ ？';talk=a+' たす '+b+(plus2?' たす ':' ひく ')+c+' は';
   }
   nq.n=ans;nq.say=talk;
   $('#numPrompt').innerHTML=prompt;
   if(choices){
     if(type==='B')choices.forEach((v,i)=>{const b=document.createElement('button');b.className='card';b.dataset.v=v;b.style.setProperty('--i',i);
       const g=document.createElement('span');g.className='cgrid';for(let k=0;k<v;k++){const e=document.createElement('i');e.textContent=emo;g.appendChild(e);}b.appendChild(g);b.setAttribute('aria-label',v+'こ');b.onclick=()=>checkNum(v,b);ch.appendChild(b);});
-    else choices.forEach((v,i)=>{const b=document.createElement('button');b.className='choice c'+i;b.dataset.v=v;b.style.setProperty('--i',i);b.textContent=v;b.onclick=()=>checkNum(v,b);ch.appendChild(b);});
+    else choices.forEach((v,i)=>{const b=document.createElement('button');b.className='choice c'+(i%3)+(type==='CMP'?' big2':'');b.dataset.v=v;b.style.setProperty('--i',i);b.textContent=v;b.onclick=()=>checkNum(v,b);ch.appendChild(b);});
   }
   say(talk);
 }
@@ -528,69 +583,58 @@ $('#numSay').onclick=()=>{if(nq)say(nq.say);};
 function numLevelMsg(){
   let msg='';
   if((state.numFail||0)>=2&&state.level.num>1){state.level.num--;state.numFail=0;state.prog.num=0;}
-  else if(state.prog.num>=5&&state.level.num<MAX.num){state.level.num++;state.prog.num=0;msg='レベル '+state.level.num+' に あがったよ！';}
+  else if(state.prog.num>=5&&state.level.num<MAX.num){state.level.num++;state.prog.num=0;msg='レベル '+state.level.num+'「'+LV_NAME[state.level.num]+'」に あがったよ！';}
   return msg;
 }
 function checkNum(v,b){
   if(nq.lock)return;
   if(v===nq.n){
-    nq.lock=true;clearPulse();b.classList.add('right');$('#numItems').classList.add('dance');{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
+    nq.lock=true;clearPulse();b.classList.add('right');$('#numItems').classList.add('dance');$('#numItems').querySelectorAll('.hide').forEach(x=>x.classList.remove('hide'));{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
     if(nq.miss<=1)state.prog.num++;
     state.numFail=nq.guided?(state.numFail||0)+1:0;
     const msg=numLevelMsg();
-    const card=['A','B','ADD','SUB','GIVE'].includes(nq.type)?'ぜんぶで '+nq.n+' こ':'';
+    const card=['A','B','ADD','SUB','GIVE','FLASH','ADD20','SUB20'].includes(nq.type)?'ぜんぶで '+nq.n+' こ':'';
     const title=nq.guided?'いっしょに できたね！':nq.miss?'あきらめずに できたね！':PRAISE[rand(PRAISE.length)];
     setTimeout(()=>celebrate(title,(card?card+' だったね。':'')+msg,newNum,card?'そう、'+card:''),650);
   }else{
     nq.miss++;shakeEl(b);sfx.ng();
-    if(nq.miss>=2&&!nq.guided){guide();return;}
+    if(nq.miss>=2&&!nq.guided||nq.type==='CMP'){guide();return;}
     if(nq.type==='GIVE')say('いま '+v+' こ だよ。'+nq.n+' こ に してみよう');
-    else say(nq.type==='SEQ'?'じゅんばんに かずを いってみよう':nq.type==='B'?'もういちど かぞえてみよう':'もういちど ゆびで かぞえてみよう');
+    else if(nq.type==='FLASH'){say('もう いちど みせるね');const it=$('#numItems').querySelectorAll('.item');it.forEach(x=>x.classList.remove('hide'));const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;it.forEach(x=>x.classList.add('hide'));nq.lock=false;},1500);}
+    else if(nq.type==='MAKE10')say('あいている ますを かぞえてみよう');
+    else say(['SEQ','SKIP'].includes(nq.type)?'じゅんばんに かずを いってみよう':nq.type==='B'?'もういちど かぞえてみよう':['MATH','THREE'].includes(nq.type)?'ゆびを つかっても いいよ':'もういちど ゆびで かぞえてみよう');
   }
 }
-/* 2回まちがえたら いっしょに数える（答えだけ教えず、数え方を見せる） */
+/* 2回まちがえたら いっしょに考える（答えだけ教えず、考え方を見せる） */
 function guide(){
-  nq.guided=true;nq.lock=true;const t=nq.type;
-  if(t==='A'||t==='ADD'||t==='SUB'||t==='GIVE'){
-    const items=[...document.querySelectorAll('#numItems .item:not(.gone)')];
+  nq.guided=true;nq.lock=true;const t=nq.type,q0=nq;const later=(fn,ms)=>setTimeout(()=>{if(nq===q0&&current==='numbers')fn();},ms);
+  const items=[...document.querySelectorAll('#numItems .item:not(.gone)')];items.forEach(x=>x.classList.remove('hide'));
+  if(['A','ADD','SUB','GIVE','FLASH','ADD20','SUB20'].includes(t)){
     items.forEach(b=>{b.classList.remove('on');b.lastChild.textContent='';});
     const target=t==='GIVE'?items.slice(0,nq.n):items;
-    say('いっしょに かぞえよう');
-    target.forEach((b,i)=>setTimeout(()=>{b.classList.add('on');b.lastChild.textContent=i+1;sfx.step(i+1);say(String(i+1),true);},1200+i*700));
-    setTimeout(()=>{nq.lock=false;
+    say(t==='ADD20'?'10の まとまりと、のこりを かぞえよう':'いっしょに かぞえよう');
+    target.forEach((b,i)=>later(()=>{b.classList.add('on');b.lastChild.textContent=i+1;sfx.step(i+1);if(!(t==='ADD20'&&i<9))say(String(i+1),true);},1200+i*(target.length>10?450:700)));
+    later(()=>{nq.lock=false;
       if(t==='GIVE'){nq.picked=target;say('これで '+nq.n+' こ。できた を おしてね',true);pulseEl($('#giveBtn'));}
       else{say('ぜんぶで '+nq.n+' こ。'+nq.n+' を おしてね',true);pulseChoice(nq.n);}
-    },1200+target.length*700+400);
+    },1200+target.length*(target.length>10?450:700)+400);
+  }else if(t==='MAKE10'){
+    const cells=[...document.querySelectorAll('#numItems .cell')];say('あいている ますを かぞえよう');
+    cells.forEach((c,i)=>later(()=>{c.classList.add('cnt');c.textContent=i+1;sfx.step(i+1);say(String(i+1),true);},1200+i*700));
+    later(()=>{nq.lock=false;say('あと '+nq.n+' で 10 だね',true);pulseChoice(nq.n);},1200+cells.length*700+400);
   }else if(t==='B'){say('この カードだよ。いっしょに かぞえてみよう');pulseChoice(nq.n);nq.lock=false;}
-  else if(t==='SEQ'){const s=nq.seqStart;say(s+'、'+(s+1)+'、'+(s+2)+'、'+(s+3)+'。はてなは '+nq.n+' だね');pulseChoice(nq.n);nq.lock=false;}
-}
-/* すうじレース：1列にならんだ 1〜10 のますを すすむ */
-function buildRace(items,ch,lv){
-  const track=document.createElement('div');track.className='track';
-  const start=document.createElement('div');start.className='sq start';start.innerHTML='<span class="tok" id="tok">'+PAIRS[rand(PAIRS.length)][0]+'</span>';track.appendChild(start);
-  const sqs=[];for(let n=1;n<=10;n++){const s=document.createElement('button');s.className='sq';s.style.setProperty('--i',n);s.style.background=RACE_COL[n-1];s.dataset.n=n;s.innerHTML='<span class="num">'+n+'</span>';s.onclick=()=>raceTap(n);sqs.push(s);track.appendChild(s);}
-  items.appendChild(track);
-  const sp=document.createElement('button');sp.className='spinner';sp.id='spinBtn';sp.innerHTML='<span class="dots">？</span><small>まわす</small>';sp.onclick=spin;ch.appendChild(sp);
-  nq.race={pos:0,left:0,max:lv>=4?3:2,sqs,spinning:false};
-  setTimeout(()=>{if(nq&&nq.race&&nq.race.pos===0&&nq.race.left===0)pulseEl($('#spinBtn'));},2500);
-}
-function spin(){
-  const R=nq.race;if(!R||R.left>0||R.spinning||nq.lock)return;R.spinning=true;clearPulse();
-  const sp=$('#spinBtn'),d=sp.querySelector('.dots');sp.classList.add('spinning');sp.classList.remove('done');
-  let k=0;const iv=setInterval(()=>{d.textContent='●'.repeat(1+rand(R.max));sfx.tick();
-    if(++k>=8){clearInterval(iv);const r=1+rand(R.max);d.textContent='●'.repeat(r);R.left=Math.min(r,10-R.pos);R.spinning=false;sp.classList.remove('spinning');sp.classList.add('done');
-      say(r+' が でた。'+R.left+'つ すすもう');markNext();}},90);
-}
-function markNext(){const R=nq.race;R.sqs.forEach(s=>s.classList.remove('next'));if(R.left>0&&R.pos<10)R.sqs[R.pos].classList.add('next');}
-function raceTap(n){
-  const R=nq.race;if(nq.lock||R.spinning)return;
-  if(R.left<=0){say('まず まわそう');pulseEl($('#spinBtn'));return;}
-  if(n!==R.pos+1){shakeEl(R.sqs[n-1]);sfx.ng();say('となりの ますを タッチしてね');return;}
-  R.pos=n;R.left--;const tok=$('#tok');R.sqs[n-1].appendChild(tok);tok.classList.remove('hop');void tok.offsetWidth;tok.classList.add('hop');sfx.step(n);say(String(n));markNext();
-  if(R.pos===10){nq.lock=true;{const r=tok.getBoundingClientRect();burst(r.left+r.width/2,r.top,30,8,false);}
-    state.prog.num++;state.numFail=0;const msg=numLevelMsg();
-    setTimeout(()=>celebrate('10まで いけたね！',msg,newNum,'ゴール'),600);return;}
-  if(R.left===0){$('#spinBtn').classList.remove('done');setTimeout(()=>{if(nq&&nq.race&&nq.race.left===0&&!nq.lock)say('もういちど まわそう',true);},800);}
+  else if(t==='SEQ'||t==='SKIP'){say(nq.seq.join('、')+'。はてなは '+nq.n+' だね');pulseChoice(nq.n);nq.lock=false;}
+  else if(t==='CMP'){const[a,b]=nq.pair;const ta=(a/10)|0,tb=(b/10)|0;
+    say(ta!==tb?'まえの かずを くらべよう。'+ta+' と '+tb+' だと '+Math.max(ta,tb)+' の ほうが おおきいね':'まえの かずは おなじ。うしろの かずを くらべよう');pulseChoice(nq.n);nq.lock=false;}
+  else if(t==='MATH'||t==='THREE'){
+    const n=t==='MATH'?nq.expr[0]:nq.expr3[0]+nq.expr3[1];const plus=t==='MATH'?nq.expr[1]:nq.expr3[3],b=t==='MATH'?nq.expr[2]:nq.expr3[2];
+    $('#numbers').classList.remove('typeMath');const it=$('#numItems');it.className='items';const emo=ITEMS[rand(ITEMS.length)];const total=plus?n+b:n;
+    tenFrame(it,i=>i<n?itemBtn(emo,i,''):(plus&&i<n+b)?itemBtn(emo,i,'g2'):null,total>10?20:10);
+    const bs=[...it.querySelectorAll('.item')];
+    say(t==='THREE'?'まず '+n+' に したよ。えで かんがえよう':'えで かんがえよう');
+    if(!plus)later(()=>bs.slice(n-b).forEach(x=>x.classList.add('gone')),1400);
+    later(()=>{nq.lock=false;say('かぞえて みてね',true);},2000);
+  }
 }
 
 /* ---------- めいろ ---------- */

@@ -180,6 +180,12 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .ov-card{animation:popin .45s cubic-bezier(.3,1.6,.5,1);background:var(--paper);border-radius:36px;padding:28px 28px 24px;width:min(460px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
 .ov-card h2{margin:0;font-size:44px;font-weight:800;color:var(--tomato)}
 .ov-card p{margin:0;font-size:20px}
+.moon{font-size:90px;line-height:1;animation:bob 3s ease-in-out infinite}
+.holdbtn{position:relative;overflow:hidden;margin-top:14px;border-radius:14px;padding:12px 16px;background:var(--sky);font-size:14px;font-weight:800;color:var(--soft);touch-action:none}
+.holdbtn .fill{position:absolute;inset:0;width:0;background:var(--line)}
+.holdbtn.holding .fill{width:100%;transition:width 2s linear}
+.holdbtn .lbl2{position:relative}
+#rest{z-index:140}
 .overlay{overflow-y:auto}
 .ov-card{max-height:100%}
 #ovStk{display:flex;align-items:center;gap:12px}
@@ -278,15 +284,25 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
   </div>
 </div>
 
+<div class="overlay" id="rest" hidden>
+  <div class="ov-card">
+    <div class="moon">🌙</div>
+    <h2 style="color:var(--grape)">きょうは ここまで</h2>
+    <p>たくさん あそんだね。<br>また あした あそぼうね！</p>
+    <button class="holdbtn" id="holdBtn"><span class="fill"></span><span class="lbl2">おうちのかた：ながおしで あと15分</span></button>
+  </div>
+</div>
 <div class="overlay" id="parent" hidden>
   <div class="pcard">
     <h2>おうちのかたへ</h2>
     <p>あそんだ記録（ほし・シール・レベル）は、このタブレットのブラウザの中にだけ保存されます。ブラウザのデータを消すと記録も消えます。</p>
     <div class="prow">おと・こえ<div class="seg" id="sndSeg"><button data-v="1">ON</button><button data-v="0">OFF</button></div></div>
     <div class="prow">かずのレベル<div class="seg" data-g="num" data-max="7"></div></div>
-    <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="8"></div></div>
+    <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="10"></div></div>
     <div class="prow">ちずパズルのレベル<div class="seg" data-g="puz" data-max="3"></div></div>
-    <p>かず（5問正解でレベルアップ）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。<br>めいろ（2回クリアでレベルアップ）：迷路が少しずつ大きくなり、レベル6からは⭐を集めてからゴール。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。ほし3こでシール1枚。</p>
+    <div class="prow">1日にあそぶ時間<div class="seg" id="limSeg"><button data-v="0">なし</button><button data-v="15">15分</button><button data-v="30">30分</button><button data-v="45">45分</button><button data-v="60">60分</button></div></div>
+    <p id="playToday"></p>
+    <p>かず（5問正解でレベルアップ）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。<br>めいろ（2回クリアでレベルアップ）：レベルが上がるほど分かれ道と行き止まりが増え、ゴールに近づくように見える間違った道も入ります。レベル7からは行き止まりの奥にある⭐を集めてからゴール、レベル9からは⭐を番号順に集めます。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。ほし3こでシール1枚。</p>
     <div class="prow"><button class="pbtn danger" id="resetBtn">記録をリセット</button><button class="pbtn" id="closeParent">とじる</button></div>
   </div>
 </div>
@@ -296,8 +312,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 const KEY='asobibako-v1';
 const STICKERS=['🦁','🐼','🦒','🐘','🦖','🚒','🚀','🌈','🍉','🍦','🐳','🦄','🚂','🐞','🦋','🌻','🍰','🚜','🐙','🦊','🎈','⛄','🐸','🚁'];
 const ITEMS=['🍎','🍓','🐟','🚗','⭐','🐤','🍩','🌷','🍌','🐞'];
-const MAX={num:7,maze:8,puz:3};
-let state={mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
+const MAX={num:7,maze:10,puz:3};
+let state={limit:0,playDay:'',playSec:0,extra:0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){state=Object.assign(state,s);state.level=Object.assign({num:1,maze:1,puz:1},s.level);state.prog=Object.assign({num:0,maze:0,puz:0},s.prog);}}catch(e){}
 if(state.level.puz>3)state.level.puz=3;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
@@ -337,11 +353,12 @@ function fxLoop(){
     fc.restore();}
   fxRaf=parts.length?requestAnimationFrame(fxLoop):0;if(!fxRaf)fc.clearRect(0,0,W,H);
 }
-const PRAISE=['すごい！','やったね！','じょうず！','かんぺき！','てんさい！'];
+const PRAISE=['よく かぞえたね！','よく みてたね！','じっくり かんがえたね！','できたね！'];
 
 /* ---------- navigation ---------- */
 let current='home';
 function show(id){
+  if(id!=='home'&&overLimit()){showRest();id='home';}
   current=id;
   document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!==id);
   refresh();
@@ -370,6 +387,15 @@ function refresh(){
 
 /* ---------- celebration ---------- */
 let onNext=null,ovT=0;
+/* あそぶ時間の目安 */
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
+function playRoll(){if(state.playDay!==today()){state.playDay=today();state.playSec=0;state.extra=0;}}
+function overLimit(){playRoll();return state.limit>0&&state.playSec>=state.limit*60+(state.extra||0);}
+function showRest(){$('#rest').hidden=false;say('きょうは ここまで。また あした あそぼうね');}
+setInterval(()=>{if(document.visibilityState!=='visible'||current==='home'||!$('#rest').hidden)return;playRoll();state.playSec=(state.playSec||0)+5;if(state.playSec%30===0)save();},5000);
+(()=>{const hb=$('#holdBtn');let ht=0;
+  hb.addEventListener('pointerdown',e=>{e.preventDefault();hb.classList.add('holding');ht=setTimeout(()=>{hb.classList.remove('holding');state.extra=(state.extra||0)+15*60;save();$('#rest').hidden=true;},2000);});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>hb.addEventListener(ev,()=>{clearTimeout(ht);hb.classList.remove('holding');}));})();
 function celebrate(title,msg,next){
   state.stars++;
   let stk=null;
@@ -383,7 +409,7 @@ function celebrate(title,msg,next){
   burst(innerWidth*.15,innerHeight,60,16);burst(innerWidth*.85,innerHeight,60,16);setTimeout(()=>burst(innerWidth/2,innerHeight*.35,50,10,false),300);
   sfx.ok();say(title+(stk?' シールを もらったよ':''));
 }
-$('#ovNext').onclick=()=>{clearTimeout(ovT);$('#ov').hidden=true;onNext&&onNext();};
+$('#ovNext').onclick=()=>{clearTimeout(ovT);$('#ov').hidden=true;if(overLimit()){show('home');showRest();return;}onNext&&onNext();};
 $('#ovHome').onclick=()=>{clearTimeout(ovT);$('#ov').hidden=true;show('home');};
 
 /* ---------- かず ---------- */
@@ -432,12 +458,12 @@ $('#numSay').onclick=()=>{if(nq)say(nq.say);};
 function checkNum(v,b){
   if(nq.lock)return;
   if(v===nq.n){
-    nq.lock=true;b.classList.add('right');$('#numItems').classList.add('dance');{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
+    nq.lock=true;b.classList.add('right');const retry=nq.miss>0;$('#numItems').classList.add('dance');{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
     state.prog.num++;let msg='';
     if(state.prog.num%5===0&&state.level.num<MAX.num){state.level.num++;msg='レベル '+state.level.num+' に あがったよ！';}
-    setTimeout(()=>celebrate(PRAISE[rand(PRAISE.length)],msg,newNum),650);
+    setTimeout(()=>celebrate(retry?'あきらめずに できたね！':PRAISE[rand(PRAISE.length)],msg,newNum),650);
   }else{
-    b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');sfx.ng();
+    nq.miss=(nq.miss||0)+1;b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');sfx.ng();
     say(nq.type==='SEQ'?'じゅんばんに かずを いってみよう':nq.type==='B'?'もういちど かぞえてみよう':'もういちど ゆびで かぞえてみよう');
   }
 }
@@ -446,27 +472,54 @@ function checkNum(v,b){
 const PAIRS=[['🐰','🥕'],['🐶','🦴'],['🐱','🐟'],['🐻','🍯'],['🐤','🌽'],['🐼','🎋']];
 const cv=$('#mzc'),cx=cv.getContext('2d');
 let mz=null,mzRaf=0;
-const MZ=[[4,0],[5,0],[6,0],[7,0],[8,0],[9,1],[10,2],[12,3]];
+/* [大きさ, ほしの数, わかれ道の多さ(0〜1), じゅんばん] */
+const MZ=[[4,0,.1],[5,0,.3],[5,0,.75],[6,0,.85],[6,0,1],[7,0,1],[7,1,1],[8,2,1],[8,2,1,1],[9,3,1,1]];
 function mzLoop(){if(current!=='maze'||!mz){mzRaf=0;return;}drawMaze();mzRaf=requestAnimationFrame(mzLoop);}
-function genMaze(c,r){
-  const cells=Array.from({length:c*r},()=>({n:1,e:1,s:1,w:1}));const seen=new Uint8Array(c*r);const st=[0];seen[0]=1;
-  while(st.length){const i=st[st.length-1],x=i%c,y=(i/c)|0,nb=[];
+/* めいろ生成：ちがう作り方で たくさん作り、わかれ道の多さで 難しさを えらぶ */
+function genMaze(c,r,pRand){
+  const N=c*r,cells=Array.from({length:N},()=>({n:1,e:1,s:1,w:1}));const seen=new Uint8Array(N);const act=[0];seen[0]=1;
+  while(act.length){const k=Math.random()<pRand?rand(act.length):act.length-1;const i=act[k],x=i%c,y=(i/c)|0,nb=[];
     if(y>0&&!seen[i-c])nb.push(['n',i-c,'s']);if(x<c-1&&!seen[i+1])nb.push(['e',i+1,'w']);
     if(y<r-1&&!seen[i+c])nb.push(['s',i+c,'n']);if(x>0&&!seen[i-1])nb.push(['w',i-1,'e']);
-    if(!nb.length){st.pop();continue;}const[d,j,od]=nb[rand(nb.length)];cells[i][d]=0;cells[j][od]=0;seen[j]=1;st.push(j);}
+    if(!nb.length){act.splice(k,1);continue;}const[d,j,od]=nb[rand(nb.length)];cells[i][d]=0;cells[j][od]=0;seen[j]=1;act.push(j);}
   return cells;
 }
+function nbrs(cells,c,i){const o=[],w=cells[i];if(!w.n)o.push(i-c);if(!w.s)o.push(i+c);if(!w.e)o.push(i+1);if(!w.w)o.push(i-1);return o;}
+function analyze(cells,c,r){
+  const N=c*r,goal=N-1,prev=new Int32Array(N).fill(-1),q=[0];prev[0]=0;
+  while(q.length){const i=q.shift();for(const j of nbrs(cells,c,i))if(prev[j]<0){prev[j]=i;q.push(j);}}
+  const path=[];for(let i=goal;i!==0;i=prev[i])path.push(i);path.push(0);path.reverse();
+  const onP=new Uint8Array(N);path.forEach(i=>onP[i]=1);
+  const depth=new Int32Array(N).fill(-1);let junc=0,trap=0,branchSum=0;
+  const gx=c-1,gy=r-1,md=i=>Math.abs(gx-i%c)+Math.abs(gy-((i/c)|0));
+  for(const p of path){for(const b of nbrs(cells,c,p)){if(onP[b])continue;
+    // 分かれ道の先を数える
+    let size=0,closest=md(b);const st=[[b,1]];depth[b]=1;
+    while(st.length){const[i,d]=st.pop();size++;closest=Math.min(closest,md(i));for(const j of nbrs(cells,c,i))if(!onP[j]&&depth[j]<0){depth[j]=d+1;st.push([j,d+1]);}}
+    if(size>=2)junc++;branchSum+=Math.min(size,10);
+    if(md(b)<md(p)&&size>=3)trap++; // ゴールに 近づいて 見える わな
+  }}
+  return{path,depth,score:junc*3+branchSum+trap*4,junc,trap};
+}
+function bestMaze(c,r,pct){
+  const cand=[];for(let t=0;t<40;t++){const cells=genMaze(c,r,Math.random()*0.7);cand.push({cells,...analyze(cells,c,r)});}
+  cand.sort((a,b)=>a.score-b.score);return cand[Math.min(cand.length-1,Math.round(pct*(cand.length-1)))];
+}
 function newMaze(){
-  const lv=state.level.maze,[n,k]=MZ[lv-1];
+  const lv=Math.min(state.level.maze,MZ.length),[n,k,pct,ordered]=MZ[lv-1];
   const r=$('#mzWrap').getBoundingClientRect();
   const wide=r.width>r.height*1.25;
   let rows=n,cols=wide?Math.round(n*1.5):n;
-  while(rows>4&&Math.min((r.width-4)/cols,(r.height-10)/rows)<40){rows--;cols=wide?Math.round(rows*1.5):rows;}
+  while(rows>4&&Math.min((r.width-4)/cols,(r.height-10)/rows)<44){rows--;cols=wide?Math.round(rows*1.5):rows;}
   const pair=PAIRS[state.prog.maze%PAIRS.length],goal=cols*rows-1;
-  const gems=new Set();while(gems.size<k){const c=1+rand(goal-1);if(c!==cols-1&&c!==goal-cols+1)gems.add(c);}
-  mz={cols,rows,cells:genMaze(cols,rows),path:[0],goal,pair,gems,got:new Set(),drag:false,done:false,last:null};
-  const talk=k?'ほしを '+k+' こ あつめて ゴールまで いこう':'ゆびで ゴールまで つれていってね';
-  $('#mzHint').textContent=k?pair[0]+' で ⭐を '+k+'こ あつめて '+pair[1]+' まで いこう':pair[0]+' を ゆびで '+pair[1]+' まで つれていってね';
+  const M=bestMaze(cols,rows,pct);
+  // ほしは 行き止まりの おく に おく（よりみちを 計画する）
+  const leaves=[];for(let i=1;i<goal;i++)if(nbrs(M.cells,cols,i).length===1&&M.depth[i]>0)leaves.push(i);
+  leaves.sort((a,b)=>M.depth[b]-M.depth[a]+(Math.random()-.5)*3);
+  const gems=leaves.slice(0,k);while(gems.length<k){const c=1+rand(goal-1);if(!gems.includes(c))gems.push(c);}
+  mz={cols,rows,cells:M.cells,path:[0],goal,pair,gems,ordered:!!ordered,got:new Set(),dead:0,lastDead:-1,drag:false,done:false,last:null};
+  const talk=k?(ordered?'ほしを 1ばんから じゅんばんに あつめて ゴールまで いこう':'ほしを '+k+' こ あつめて ゴールまで いこう'):'ゆびで ゴールまで つれていってね。いきどまりに ちゅうい！';
+  $('#mzHint').textContent=k?(ordered?pair[0]+' で ⭐を 1→'+k+' の じゅんに あつめて '+pair[1]+' まで':pair[0]+' で ⭐を '+k+'こ あつめて '+pair[1]+' まで いこう'):pair[0]+' を ゆびで '+pair[1]+' まで つれていってね';
   sizeMaze();say(talk);if(!mzRaf&&!RM)mzRaf=requestAnimationFrame(mzLoop);
 }
 function sizeMaze(){
@@ -494,8 +547,12 @@ function drawMaze(){
   cx.save();cx.translate(m,m);cx.scale((W-2*m)/W,(H-2*m)/H);cx.stroke();cx.restore();
   cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#24344D';cx.font=Math.floor(cell*0.62)+'px sans-serif';
   const head=path[path.length-1];
-  for(const c of mz.gems){if(mz.got.has(c))continue;const[sx2,sy2]=ctr(c),sc=1+0.12*Math.sin(T*5+c);cx.save();cx.translate(sx2,sy2+cell*0.04);cx.scale(sc,sc);cx.fillText('⭐',0,0);cx.restore();}
-  if(head!==goal){const sc=1+0.1*Math.sin(T*4);cx.save();cx.globalAlpha=mz.got.size<mz.gems.size?0.45:1;cx.translate(gx,gy+cell*0.04);cx.scale(sc,sc);cx.fillText(mz.pair[1],0,0);cx.restore();}
+  mz.gems.forEach((c,gi)=>{if(mz.got.has(c))return;const[sx2,sy2]=ctr(c),sc=1+0.12*Math.sin(T*5+c);cx.save();cx.translate(sx2,sy2+cell*0.04);cx.scale(sc,sc);cx.fillText('⭐',0,0);
+    if(mz.ordered){cx.font='800 '+Math.floor(cell*0.34)+'px sans-serif';cx.lineWidth=4;cx.strokeStyle='#FFFFFF';cx.strokeText(String(gi+1),0,cell*0.04);cx.fillStyle='#24344D';cx.fillText(String(gi+1),0,cell*0.04);}
+    cx.restore();});
+  cx.font=Math.floor(cell*0.62)+'px sans-serif';cx.fillStyle='#24344D';
+  if(mz.lastDead>=0&&mz.path[mz.path.length-1]===mz.lastDead){const[dx2,dy2]=ctr(mz.lastDead);cx.fillStyle='rgba(242,97,75,'+(0.18+0.12*Math.sin(T*8))+')';cx.fillRect(dx2-cell/2,dy2-cell/2,cell,cell);cx.fillStyle='#24344D';}
+  if(head!==goal){const sc=1+0.1*Math.sin(T*4);cx.save();cx.globalAlpha=mz.got.size<mz.gems.length?0.45:1;cx.translate(gx,gy+cell*0.04);cx.scale(sc,sc);cx.fillText(mz.pair[1],0,0);cx.restore();}
   const[hx,hy]=ctr(head);
   if(path.length===1&&!mz.drag){const rr_=cell*(0.42+0.08*Math.sin(T*5));cx.strokeStyle='rgba(242,97,75,.6)';cx.lineWidth=4;cx.beginPath();cx.arc(hx,hy,rr_,0,7);cx.stroke();}
   cx.fillText(mz.pair[0],hx,hy+cell*0.04-Math.abs(Math.sin(T*5))*cell*(mz.drag?0.02:0.07));
@@ -506,12 +563,17 @@ function step(t){
   if(t<0||mz.done)return;const p=mz.path,head=p[p.length-1];if(t===head)return;
   if(p.length>1&&t===p[p.length-2]){p.pop();drawMaze();return;}
   if(open(head,t)&&!p.includes(t)){p.push(t);sfx.step(p.length);
-    if(mz.gems.has(t)&&!mz.got.has(t)){mz.got.add(t);sfx.pop();{const r=cv.getBoundingClientRect(),[a2,b2]=ctr(t);burst(r.left+a2,r.top+b2,16,6,false);}
-      const left=mz.gems.size-mz.got.size;say(left?'あと '+left+' こ':'ぜんぶ あつめたよ！ ゴールへ いこう');}
+    let talked=false;
+    const gi=mz.gems.indexOf(t);
+    if(gi>=0&&!mz.got.has(t)){
+      if(mz.ordered&&gi!==mz.got.size){say((mz.got.size+1)+' ばんの ほしから とってね');sfx.ng();talked=true;}
+      else{mz.got.add(t);sfx.pop();{const r=cv.getBoundingClientRect(),[a2,b2]=ctr(t);burst(r.left+a2,r.top+b2,16,6,false);}
+        const left=mz.gems.length-mz.got.size;say(left?'あと '+left+' こ。もどって さがそう':'ぜんぶ あつめたよ！ もどって ゴールへ いこう');talked=true;}}
+    if(t!==mz.goal&&nbrs(mz.cells,mz.cols,t).length===1&&gi<0){mz.dead++;mz.lastDead=t;sfx.ng();if(!talked)say('いきどまり！ もどって みよう');}
     drawMaze();
-    if(t===mz.goal&&mz.got.size<mz.gems.size){say('ほしを ぜんぶ あつめてから ゴールしてね');sfx.ng();return;}
-    if(t===mz.goal){mz.done=true;mz.drag=false;{const r=cv.getBoundingClientRect(),[gx2,gy2]=ctr(t);burst(r.left+gx2,r.top+gy2,40,9,false);}state.prog.maze++;let msg='';
-      if(state.prog.maze%2===0&&state.level.maze<MAX.maze){state.level.maze++;msg='レベル '+state.level.maze+' に あがったよ！';}
+    if(t===mz.goal&&mz.got.size<mz.gems.length){say('ほしを ぜんぶ あつめてから ゴールしてね');sfx.ng();return;}
+    if(t===mz.goal){mz.done=true;mz.drag=false;{const r=cv.getBoundingClientRect(),[gx2,gy2]=ctr(t);burst(r.left+gx2,r.top+gy2,40,9,false);}state.prog.maze++;let msg=mz.dead?'いきどまりから もどって ゴールできたね！':'まよわずに いけたね！';
+      if(state.prog.maze%2===0&&state.level.maze<MAX.maze){state.level.maze++;msg+=' レベル '+state.level.maze+' に あがったよ！';}
       setTimeout(()=>celebrate('ゴール！',msg,newMaze),400);}}
 }
 cv.addEventListener('pointerdown',e=>{if(!mz||mz.done)return;const t=cellAt(e.clientX,e.clientY);const i=mz.path.indexOf(t);
@@ -682,6 +744,8 @@ window.addEventListener('resize',()=>{if(current==='maze')sizeMaze();if(current=
 
 /* ---------- おうちのかたへ ---------- */
 function paintParent(){
+  playRoll();document.querySelectorAll('#limSeg button').forEach(b=>b.classList.toggle('sel',+b.dataset.v===(state.limit||0)));
+  $('#playToday').textContent='きょう あそんだ時間：'+Math.floor((state.playSec||0)/60)+'分。時間になると、ゲームのきりがよいところで「きょうはここまで」の画面になります（ボタンの長押しで15分延長）。';
   document.querySelectorAll('#sndSeg button').forEach(b=>b.classList.toggle('sel',(b.dataset.v==='1')===state.sound));
   document.querySelectorAll('.seg[data-g]').forEach(seg=>{const g=seg.dataset.g;seg.innerHTML='';
     for(let i=1;i<=+seg.dataset.max;i++){const b=document.createElement('button');b.textContent=i;b.classList.toggle('sel',state.level[g]===i);
@@ -689,10 +753,11 @@ function paintParent(){
 }
 $('#openParent').onclick=()=>{paintParent();$('#resetBtn').textContent='記録をリセット';$('#parent').hidden=false;};
 $('#closeParent').onclick=()=>{$('#parent').hidden=true;};
+document.querySelectorAll('#limSeg button').forEach(b=>b.onclick=()=>{state.limit=+b.dataset.v;save();paintParent();});
 document.querySelectorAll('#sndSeg button').forEach(b=>b.onclick=()=>{state.sound=b.dataset.v==='1';save();paintParent();});
 $('#resetBtn').onclick=e=>{const b=e.currentTarget;
   if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='もう一度押すと全部消えます';setTimeout(()=>{b.dataset.armed='';b.textContent='記録をリセット';},4000);return;}
-  b.dataset.armed='';state={mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:state.sound};save();refresh();paintParent();b.textContent='リセットしました';};
+  b.dataset.armed='';state={limit:state.limit||0,playDay:state.playDay,playSec:state.playSec||0,extra:state.extra||0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:state.sound};save();refresh();paintParent();b.textContent='リセットしました';};
 
 refresh();
 const fsEl=document.documentElement,fsReq=fsEl.requestFullscreen||fsEl.webkitRequestFullscreen;

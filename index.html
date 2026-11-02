@@ -330,7 +330,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <p>あそんだ記録（ほし・シール・レベル）は、このタブレットのブラウザの中にだけ保存されます。ブラウザのデータを消すと記録も消えます。</p>
     <div class="prow">おと・こえ<div class="seg" id="sndSeg"><button data-v="1">ON</button><button data-v="0">OFF</button></div></div>
     <div class="prow">かずのレベル<div class="seg" data-g="num" data-max="7"></div></div>
-    <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="10"></div></div>
+    <div class="prow">めいろのレベル<div class="seg" data-g="maze" data-max="20"></div></div>
     <div class="prow">ちずパズルのレベル<div class="seg" data-g="puz" data-max="3"></div></div>
     <div class="prow">1日にあそぶ時間<div class="seg" id="limSeg"><button data-v="0">なし</button><button data-v="15">15分</button><button data-v="30">30分</button><button data-v="45">45分</button><button data-v="60">60分</button></div></div>
     <p id="playToday"></p>
@@ -345,7 +345,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
         <li>1回15〜20分くらい、毎日少しずつのほうが身につきやすいです。</li>
       </ul>
     </details>
-    <p>かず（5問正解でレベルアップ。2回つまずくと一緒に数える助けが入り、それが続くとレベルが1つ下がります）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。レベル2から「○こ とって」と「すうじレース（1〜10のすごろく）」も出ます。<br>めいろ（すんなりクリアが2回でレベルアップ。12秒止まると矢印と「みぎ・ひだり」のことばでヒントが出ます。ヒントが続くとレベルが1つ下がります）：レベルが上がるほど分かれ道と行き止まりが増え、ゴールに近づくように見える間違った道も入ります。レベル7からは行き止まりの奥にある⭐を集めてからゴール、レベル9からは⭐を番号順に集めます。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。地方が完成すると、名前を聞いて場所を探す「どこかな？」が2〜4問出ます（間違えても減点はありません）。「おうちの ある 都道府県」を選ぶと、その県に🏠が付きます。ほし3こでシール1枚。</p>
+    <p>かず（5問正解でレベルアップ。2回つまずくと一緒に数える助けが入り、それが続くとレベルが1つ下がります）：1 数える1〜3、2 1〜5、3 1〜10、4 たし算（5まで）、5 たし算（10まで）、6 ひき算（10まで）、7 数の順番（20まで）。レベル2から「○こ とって」と「すうじレース（1〜10のすごろく）」も出ます。<br>めいろ（すんなりクリアが2回でレベルアップ。12秒止まると矢印と「みぎ・ひだり」のことばでヒントが出ます。ヒントが続くとレベルが1つ下がります）：レベルが上がるほど分かれ道と行き止まりが増え、ゴールに近づくように見える間違った道も入ります。レベル7からは行き止まりの奥にある⭐を集めてからゴール、レベル9からは⭐を番号順に集めます。レベル11からは🔑で🚪を開ける仕掛け（15からは色ちがいの鍵が2つ）、レベル13からは最初の5秒だけ迷路が見えて、その後は周りしか見えない「くらやみ」が加わります（通った場所は薄く見えたまま）。<br>ちずパズル：日本地図から地方を選び、都道府県のピースをはめます。7地方すべて完成でレベルアップ（1：地図に色のヒント、2：ヒントなし、3：ピースの名前もなし）。ピースは引っぱって運ぶか、ピースをタッチしてから地図の場所をタッチしてはめます。地方が完成すると、名前を聞いて場所を探す「どこかな？」が2〜4問出ます（間違えても減点はありません）。「おうちの ある 都道府県」を選ぶと、その県に🏠が付きます。ほし3こでシール1枚。</p>
     <div class="prow"><button class="pbtn danger" id="resetBtn">記録をリセット</button><button class="pbtn" id="closeParent">とじる</button></div>
   </div>
 </div>
@@ -355,7 +355,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 const KEY='asobibako-v1';
 const STICKERS=['🦁','🐼','🦒','🐘','🦖','🚒','🚀','🌈','🍉','🍦','🐳','🦄','🚂','🐞','🦋','🌻','🍰','🚜','🐙','🦊','🎈','⛄','🐸','🚁'];
 const ITEMS=['🍎','🍓','🐟','🚗','⭐','🐤','🍩','🌷','🍌','🐞'];
-const MAX={num:7,maze:10,puz:3};
+const MAX={num:7,maze:20,puz:3};
 let state={limit:0,playDay:'',playSec:0,extra:0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){state=Object.assign(state,s);state.level=Object.assign({num:1,maze:1,puz:1},s.level);state.prog=Object.assign({num:0,maze:0,puz:0},s.prog);}}catch(e){}
 if(state.level.puz>3)state.level.puz=3;
@@ -598,17 +598,19 @@ const PAIRS=[['🐰','🥕'],['🐶','🦴'],['🐱','🐟'],['🐻','🍯'],['�
 const cv=$('#mzc'),cx=cv.getContext('2d');
 let mz=null,mzRaf=0;
 /* [大きさ, ほしの数, わかれ道の多さ(0〜1), じゅんばん] */
-const MZ=[[4,0,.1],[5,0,.3],[5,0,.75],[6,0,.85],[6,0,1],[7,0,1],[7,1,1],[8,2,1],[8,2,1,1],[9,3,1,1]];
+/* [大きさ, ほし, わかれ道の多さ, ほしの順番, かぎ, くらやみ] */
+const MZ=[[4,0,.1],[5,0,.3],[5,0,.75],[6,0,.85],[6,0,1],[7,0,1],[7,1,1],[8,2,1],[8,2,1,1],[9,3,1,1],
+  [10,0,1,0,1,0],[10,2,1,0,1,0],[10,0,1,0,0,1],[11,2,1,0,0,1],[11,0,1,0,2,0],[12,3,1,1,1,0],[12,0,1,0,1,1],[13,0,1,0,2,1],[13,3,1,1,1,1],[14,3,1,1,2,1]];
 function mzLoop(){if(current!=='maze'||!mz){mzRaf=0;return;}if(!mz.done&&$('#ov').hidden&&$('#rest').hidden&&performance.now()>mz.hintAt)showMzHint();drawMaze();mzRaf=requestAnimationFrame(mzLoop);}
 /* こまったときのヒント：いまの場所から つぎに進む1マスを 矢印と「みぎ・ひだり・うえ・した」のことばで */
 function bfsNext(from,to){const C=mz.cols,N=C*mz.rows,prev=new Int32Array(N).fill(-1),q=[from];prev[from]=from;
-  while(q.length){const i=q.shift();if(i===to)break;for(const j of nbrs(mz.cells,C,i))if(prev[j]<0){prev[j]=i;q.push(j);}}
+  while(q.length){const i=q.shift();if(i===to)break;for(const j of nbrs(mz.cells,C,i))if(prev[j]<0&&!mz.doors.some(d=>d.cell===j&&!d.open&&!d.got)){prev[j]=i;q.push(j);}}
   if(prev[to]<0||to===from)return -1;let i=to;while(prev[i]!==from)i=prev[i];return i;}
-function mzTarget(){const left=mz.gems.filter(g=>!mz.got.has(g));if(!left.length)return mz.goal;if(mz.ordered)return left[0];
+function mzTarget(){const dk=mz.doors.find(d=>!d.open&&!d.got);if(dk)return dk.key;const left=mz.gems.filter(g=>!mz.got.has(g));if(!left.length)return mz.goal;if(mz.ordered)return left[0];
   const C=mz.cols,h=mz.path[mz.path.length-1],md=i=>Math.abs(i%C-h%C)+Math.abs(((i/C)|0)-((h/C)|0));return left.slice().sort((a,b)=>md(a)-md(b))[0];}
 function showMzHint(){const head=mz.path[mz.path.length-1],nx=bfsNext(head,mzTarget());mz.hintAt=performance.now()+12000;if(nx<0)return;
   mz.hintCell=nx;mz.usedHint=true;const C=mz.cols,dx=nx%C-head%C,dy=((nx/C)|0)-((head/C)|0);const w=dx>0?'みぎ':dx<0?'ひだり':dy>0?'した':'うえ';say('ヒント。'+w+' に いってみよう');}
-function mzTouched(){if(!mz)return;mz.hintCell=null;mz.hintAt=performance.now()+12000;}
+function mzTouched(){if(!mz)return;if(mz.fog&&mz.fogAt>performance.now())mz.fogAt=performance.now();mz.hintCell=null;mz.hintAt=performance.now()+12000;}
 /* めいろ生成：ちがう作り方で たくさん作り、わかれ道の多さで 難しさを えらぶ */
 function genMaze(c,r,pRand){
   const N=c*r,cells=Array.from({length:N},()=>({n:1,e:1,s:1,w:1}));const seen=new Uint8Array(N);const act=[0];seen[0]=1;
@@ -633,28 +635,51 @@ function analyze(cells,c,r){
     if(size>=2)junc++;branchSum+=Math.min(size,10);
     if(md(b)<md(p)&&size>=3)trap++; // ゴールに 近づいて 見える わな
   }}
-  return{path,depth,score:junc*3+branchSum+trap*4,junc,trap};
+  return{path,depth,score:junc*3+branchSum+trap*4+path.length*0.5,junc,trap};
 }
 function bestMaze(c,r,pct){
   const cand=[];for(let t=0;t<40;t++){const cells=genMaze(c,r,Math.random()*0.7);cand.push({cells,...analyze(cells,c,r)});}
   cand.sort((a,b)=>a.score-b.score);return cand[Math.min(cand.length-1,Math.round(pct*(cand.length-1)))];
 }
 function newMaze(){
-  const lv=Math.min(state.level.maze,MZ.length),[n,k,pct,ordered]=MZ[lv-1];
+  const lv=Math.min(state.level.maze,MZ.length),[n,k,pct,ordered,nKeys=0,fog=0]=MZ[lv-1];
   const r=$('#mzWrap').getBoundingClientRect();
   const wide=r.width>r.height*1.25;
   let rows=n,cols=wide?Math.round(n*1.5):n;
   while(rows>4&&Math.min((r.width-4)/cols,(r.height-10)/rows)<44){rows--;cols=wide?Math.round(rows*1.5):rows;}
   const pair=PAIRS[state.prog.maze%PAIRS.length],goal=cols*rows-1;
   const M=bestMaze(cols,rows,Math.max(0,Math.min(1,pct+(state.mzAdj||0))));
+  // 分かれ道が ゴールまでの道の 何ばんめから 出ているか
+  const N=cols*rows,att=new Int32Array(N).fill(-1),dep=new Int32Array(N);M.path.forEach((c,i)=>att[c]=i);
+  const q=M.path.slice();while(q.length){const i=q.shift();for(const j of nbrs(M.cells,cols,i))if(att[j]<0){att[j]=att[i];dep[j]=dep[i]+1;q.push(j);}}
+  const isLeaf=i=>i>0&&i<goal&&nbrs(M.cells,cols,i).length===1&&dep[i]>0;
+  const used=new Set();
+  // かぎ と とびら：とびらは ゴールまでの道の上（ぜったい通る）、かぎは とびらより 手前の わき道の おく
+  const doors=[];const L=M.path.length;
+  const dPos=nKeys===2?[.38,.72]:[.55];
+  for(let d=0;d<nKeys;d++){
+    const di=Math.max(2,Math.min(L-2,Math.round(L*dPos[d])));const lo=d===0?0:doors[d-1].idx;
+    let cand=[];for(let i=0;i<N;i++)if(isLeaf(i)&&!used.has(i)&&att[i]<di&&att[i]>=lo)cand.push(i);
+    if(!cand.length)for(let i=0;i<N;i++)if(isLeaf(i)&&!used.has(i)&&att[i]<di)cand.push(i);
+    if(!cand.length)continue;
+    cand.sort((a,b)=>dep[b]-dep[a]+(Math.random()-.5)*2);const key=cand[0];used.add(key);
+    doors.push({cell:M.path[di],idx:di,key,open:false,got:false,col:['#F2614B','#5AA9E6'][d]});
+  }
   // ほしは 行き止まりの おく に おく（よりみちを 計画する）
-  const leaves=[];for(let i=1;i<goal;i++)if(nbrs(M.cells,cols,i).length===1&&M.depth[i]>0)leaves.push(i);
-  leaves.sort((a,b)=>M.depth[b]-M.depth[a]+(Math.random()-.5)*3);
-  const gems=leaves.slice(0,k);while(gems.length<k){const c=1+rand(goal-1);if(!gems.includes(c))gems.push(c);}
-  mz={cols,rows,cells:M.cells,path:[0],goal,pair,gems,ordered:!!ordered,got:new Set(),dead:0,lastDead:-1,drag:false,done:false,last:null,hintAt:performance.now()+12000,hintCell:null,usedHint:false};
-  const talk=k?(ordered?'ほしを 1ばんから じゅんばんに あつめて ゴールまで いこう':'ほしを '+k+' こ あつめて ゴールまで いこう'):'ゆびで ゴールまで つれていってね。いきどまりに ちゅうい！';
-  $('#mzHint').textContent=k?(ordered?pair[0]+' で ⭐を 1→'+k+' の じゅんに あつめて '+pair[1]+' まで':pair[0]+' で ⭐を '+k+'こ あつめて '+pair[1]+' まで いこう'):pair[0]+' を ゆびで '+pair[1]+' まで つれていってね';
-  sizeMaze();say(lv>=3?'うごく まえに、めで みちを さがしてみよう。'+talk:talk);if(!mzRaf&&!RM)mzRaf=requestAnimationFrame(mzLoop);
+  const leaves=[];for(let i=1;i<goal;i++)if(isLeaf(i)&&!used.has(i))leaves.push(i);
+  leaves.sort((a,b)=>dep[b]-dep[a]+(Math.random()-.5)*3);
+  const gems=leaves.slice(0,k);while(gems.length<k){const c=1+rand(goal-1);if(!gems.includes(c)&&!used.has(c)&&!doors.some(d=>d.cell===c))gems.push(c);}
+  mz={cols,rows,cells:M.cells,path:[0],goal,pair,gems,ordered:!!ordered,doors,fog:!!fog,seen:new Uint8Array(N),fogAt:fog?performance.now()+5000:0,
+    got:new Set(),dead:0,lastDead:-1,drag:false,done:false,last:null,hintAt:performance.now()+(fog?17000:12000),hintCell:null,usedHint:false,refuseAt:0};
+  const parts=[];
+  if(doors.length)parts.push(doors.length===2?'あかい かぎで あかい とびら、あおい かぎで あおい とびらを あけて':'かぎを みつけて とびらを あけて');
+  if(k)parts.push(ordered?'ほしを 1ばんから じゅんばんに あつめて':'ほしを '+k+' こ あつめて');
+  const talk=(parts.length?parts.join('、')+'、ゴールまで いこう':'ゆびで ゴールまで つれていってね。いきどまりに ちゅうい！');
+  const hint=[];if(doors.length)hint.push('🔑で🚪を あけて');if(k)hint.push(ordered?'⭐を 1→'+k+' の じゅんに':'⭐を '+k+'こ');
+  $('#mzHint').textContent=fog?'よく みて おぼえてね。もうすぐ くらく なるよ':pair[0]+' で '+(hint.length?hint.join('、')+' ':'')+pair[1]+' まで いこう';
+  sizeMaze();
+  say(fog?'よく みて、みちを おぼえてね。もうすぐ くらく なるよ。'+talk:lv>=3?'うごく まえに、めで みちを さがしてみよう。'+talk:talk);
+  if(!mzRaf&&!RM)mzRaf=requestAnimationFrame(mzLoop);
 }
 function sizeMaze(){
   if(!mz)return;const r=$('#mzWrap').getBoundingClientRect();
@@ -673,14 +698,25 @@ function drawMaze(){
   const T=performance.now()/1000;
   cx.lineWidth=cell*0.32;cx.lineCap='round';
   for(let k=1;k<path.length;k++){const[a,b]=ctr(path[k-1]),[c2,d2]=ctr(path[k]);cx.strokeStyle='hsl('+((k*32)%360)+' 85% 62%)';cx.beginPath();cx.moveTo(a,b);cx.lineTo(c2,d2);cx.stroke();}
+  for(const d of mz.doors){const[dx3,dy3]=ctr(d.cell);if(d.open)continue;cx.fillStyle=d.col;cx.globalAlpha=d.got?0.35:0.9;cx.fillRect(dx3-cell*.42,dy3-cell*.42,cell*.84,cell*.84);cx.globalAlpha=1;}
   const lw=Math.max(3,cell*0.09);cx.strokeStyle='#24344D';cx.lineWidth=lw;cx.lineCap='round';cx.beginPath();
   const m=lw/2;
   for(let i=0;i<cells.length;i++){const x=(i%cols)*cell,y=((i/cols)|0)*cell,c=cells[i];
     if(c.n){cx.moveTo(x,y);cx.lineTo(x+cell,y);} if(c.w){cx.moveTo(x,y);cx.lineTo(x,y+cell);}
     if(c.e&&i%cols===cols-1){cx.moveTo(x+cell,y);cx.lineTo(x+cell,y+cell);} if(c.s&&((i/cols)|0)===rows-1){cx.moveTo(x,y+cell);cx.lineTo(x+cell,y+cell);} }
   cx.save();cx.translate(m,m);cx.scale((W-2*m)/W,(H-2*m)/H);cx.stroke();cx.restore();
-  cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#24344D';cx.font=Math.floor(cell*0.62)+'px sans-serif';
   const head=path[path.length-1];
+  if(mz.fog){const now=performance.now(),[hx0,hy0]=[head%cols,(head/cols)|0];
+    for(let i=0;i<cells.length;i++){const x=i%cols,y=(i/cols)|0;if(Math.hypot(x-hx0,y-hy0)<=3.2)mz.seen[i]=1;}
+    if(now>mz.fogAt){const a=Math.min(1,(now-mz.fogAt)/800);
+      if(a>0.9&&$('#mzHint').textContent.startsWith('よく みて'))$('#mzHint').textContent='くらい ところは みえないよ。'+mz.pair[1]+' を めざそう';
+      for(let i=0;i<cells.length;i++){const x=i%cols,y=(i/cols)|0,dd=Math.hypot(x-hx0,y-hy0);if(dd<=2.2)continue;
+        const al=dd<=3.2?0.35:mz.seen[i]?0.6:0.97;cx.fillStyle='rgba(30,40,70,'+(al*a)+')';cx.fillRect(x*cell,y*cell,cell,cell);}}}
+  cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#24344D';cx.font=Math.floor(cell*0.62)+'px sans-serif';
+  for(const d of mz.doors){const[dx3,dy3]=ctr(d.cell);
+    if(!d.open){cx.font=Math.floor(cell*0.5)+'px sans-serif';cx.fillText(d.got?'🔓':'🔒',dx3,dy3+cell*0.04);}
+    if(!d.got){const[kx,ky]=ctr(d.key),sc=1+0.12*Math.sin(T*5+d.key);cx.save();cx.translate(kx,ky);cx.scale(sc,sc);cx.fillStyle=d.col;cx.beginPath();cx.arc(0,0,cell*0.36,0,7);cx.fill();cx.font=Math.floor(cell*0.48)+'px sans-serif';cx.fillText('🔑',0,cell*0.04);cx.restore();}}
+  cx.font=Math.floor(cell*0.62)+'px sans-serif';cx.fillStyle='#24344D';
   mz.gems.forEach((c,gi)=>{if(mz.got.has(c))return;const[sx2,sy2]=ctr(c),sc=1+0.12*Math.sin(T*5+c);cx.save();cx.translate(sx2,sy2+cell*0.04);cx.scale(sc,sc);cx.fillText('⭐',0,0);
     if(mz.ordered){cx.font='800 '+Math.floor(cell*0.34)+'px sans-serif';cx.lineWidth=4;cx.strokeStyle='#FFFFFF';cx.strokeText(String(gi+1),0,cell*0.04);cx.fillStyle='#24344D';cx.fillText(String(gi+1),0,cell*0.04);}
     cx.restore();});
@@ -698,14 +734,20 @@ function open(a,b){const c=mz.cells[a],C=mz.cols;if(b===a+1&&((a/C)|0)===((b/C)|
 function step(t){
   if(t<0||mz.done)return;const p=mz.path,head=p[p.length-1];if(t===head)return;
   if(p.length>1&&t===p[p.length-2]){p.pop();mzTouched();drawMaze();return;}
-  if(open(head,t)&&!p.includes(t)){p.push(t);mzTouched();sfx.step(p.length);
+  if(open(head,t)&&!p.includes(t)){
+    const dr=mz.doors.find(d=>d.cell===t&&!d.open);
+    if(dr){if(dr.got){dr.open=true;sfx.ok();say('とびらが あいた！');{const r=cv.getBoundingClientRect(),[a2,b2]=ctr(t);burst(r.left+a2,r.top+b2,20,6,false);}}
+      else{mz.drag=false;if(performance.now()>mz.refuseAt){mz.refuseAt=performance.now()+2500;sfx.ng();say(mz.doors.length===2?'この いろの かぎが いるよ。さがしに いこう':'かぎが かかってる。かぎを さがそう');}return;}}
+    p.push(t);mzTouched();sfx.step(p.length);
     let talked=false;
+    const kd=mz.doors.find(d=>d.key===t&&!d.got);
+    if(kd){kd.got=true;sfx.pop();{const r=cv.getBoundingClientRect(),[a2,b2]=ctr(t);burst(r.left+a2,r.top+b2,16,6,false);}say('かぎを みつけた！ とびらまで もどろう');talked=true;}
     const gi=mz.gems.indexOf(t);
     if(gi>=0&&!mz.got.has(t)){
       if(mz.ordered&&gi!==mz.got.size){say((mz.got.size+1)+' ばんの ほしから とってね');sfx.ng();talked=true;}
       else{mz.got.add(t);sfx.pop();{const r=cv.getBoundingClientRect(),[a2,b2]=ctr(t);burst(r.left+a2,r.top+b2,16,6,false);}
         const left=mz.gems.length-mz.got.size;say(left?'あと '+left+' こ。もどって さがそう':'ぜんぶ あつめたよ！ もどって ゴールへ いこう');talked=true;}}
-    if(t!==mz.goal&&nbrs(mz.cells,mz.cols,t).length===1&&gi<0){mz.dead++;mz.lastDead=t;sfx.ng();if(!talked)say('いきどまり！ もどって みよう');}
+    if(t!==mz.goal&&nbrs(mz.cells,mz.cols,t).length===1&&gi<0&&!kd){mz.dead++;mz.lastDead=t;sfx.ng();if(!talked)say('いきどまり！ もどって みよう');}
     drawMaze();
     if(t===mz.goal&&mz.got.size<mz.gems.length){say('ほしを ぜんぶ あつめてから ゴールしてね');sfx.ng();return;}
     if(t===mz.goal){mz.done=true;mz.drag=false;{const r=cv.getBoundingClientRect(),[gx2,gy2]=ctr(t);burst(r.left+gx2,r.top+gy2,40,9,false);}state.prog.maze++;let msg=mz.usedHint?'ヒントを つかって ゴールできたね！':mz.dead?'いきどまりから もどって ゴールできたね！':'まよわずに いけたね！';

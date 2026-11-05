@@ -144,6 +144,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .frames .item{width:100%;height:100%;font-size:calc(var(--cell)*.62)}
 .frames .cell,.frame .cell{border-radius:16px;border:3px dashed var(--line)}
 .cell.cnt{background:#FFF3D6;border-color:var(--sun);display:grid;place-items:center;font-weight:800;font-size:calc(var(--cell)*.4);color:var(--tomato)}
+.items{position:relative}
+.items.covered>*{visibility:hidden}
+.items.covered::after{content:"？";position:absolute;inset:10px;border-radius:20px;background:var(--sky);display:grid;place-items:center;font-size:clamp(56px,10vw,96px);font-weight:800;color:var(--soft)}
 .item.hide span:first-child{visibility:hidden}
 .item.hide{background:var(--sky)}
 .choice.big2{width:auto;min-width:clamp(140px,22vw,200px);padding:0 24px}
@@ -481,6 +484,7 @@ $('#ovHome').onclick=()=>{clearTimeout(ovT);$('#ov').hidden=true;show('home');};
 /* ---------- かず ---------- */
 let nq=null;
 function choicesFor(ans,lo,hi,n=3){const s=new Set([ans]);for(const v of shuffle([ans-2,ans-1,ans+1,ans+2,ans-10,ans+10].filter(v=>v>=lo&&v<=hi))){if(s.size>=n)break;s.add(v);}while(s.size<n)s.add(lo+rand(hi-lo+1));return shuffle([...s]);}
+function coverLater(items,ms){nq.cover=true;const q=nq;setTimeout(()=>{if(nq===q&&!nq.guided&&!nq.lock)items.classList.add('covered');},ms);}
 function shakeEl(b){b.classList.remove('wrong');void b.offsetWidth;b.classList.add('wrong');}
 function pulseEl(b){if(!b)return;b.classList.add('hintpulse');}
 function clearPulse(){document.querySelectorAll('.hintpulse').forEach(b=>b.classList.remove('hintpulse'));}
@@ -545,24 +549,24 @@ function newNum(){
     ans=3+rand(8);choices=choicesFor(ans,1,10,nOpt);const ms=Math.max(900,1600-(lv-8)*100);
     prompt='ぱっと みて いくつ？';talk='よく みててね。ぱっと きえるよ';
     const shown=new Set(ans>5&&Math.random()<.5?[...Array(ans).keys()]:shuffle([...Array(10).keys()]).slice(0,ans));
-    tenFrame(items,i=>shown.has(i)?itemBtn(emo,i):null);
-    const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;items.querySelectorAll('.item').forEach(b=>b.classList.add('hide'));nq.lock=false;say('いくつ だった？',true);},800+ms);
+    tenFrame(items,i=>shown.has(i)?itemBtn(emo,i):null);nq.cover=true;
+    const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;items.classList.add('covered');nq.lock=false;say('いくつ だった？',true);},800+ms);
   }else if(type==='MAKE10'){ // あと いくつで 10？
     const a=1+rand(9);ans=10-a;choices=choicesFor(ans,1,9,nOpt);
-    prompt='あと いくつで <span class="bignum">10</span>？';talk=a+' こ あるよ。あと いくつで 10 に なるかな';
-    tenFrame(items,i=>i<a?itemBtn(emo,i):null);
+    prompt='あと いくつで <span class="bignum">10</span>？';talk=a+' こ あるよ。あと いくつで 10 に なるかな';nq.a=a;nq.emo=emo;
+    for(let i=0;i<a;i++)items.appendChild(itemBtn(emo,i));
   }else if(type==='ADD20'){ // くりあがり：10の まとまりを つくって 考える
     const a=4+rand(6),bb=11-a+rand(a-1);ans=a+bb;choices=choicesFor(ans,10,20,nOpt);
     prompt=a+' ＋ '+bb+' は いくつ？';talk=a+' たす '+bb+' は いくつ';
-    tenFrame(items,i=>i<a?itemBtn(emo,i):i<a+bb?itemBtn(emo,i,'g2'):null,20);
+    tenFrame(items,i=>i<a?itemBtn(emo,i):i<a+bb?itemBtn(emo,i,'g2'):null,20);coverLater(items,3000);
   }else if(type==='SUB20'){
     const n=11+rand(9),m=2+rand(Math.min(8,n-2));ans=n-m;choices=choicesFor(ans,1,18,nOpt);
     prompt=n+' － '+m+' は いくつ？';talk=n+' ひく '+m+' は いくつ';
     const bs=[];tenFrame(items,i=>{if(i>=n)return null;const b=itemBtn(emo,i);bs.push(b);return b;},20);
-    setTimeout(()=>bs.slice(n-m).forEach(b=>b.classList.add('gone')),1100);
+    setTimeout(()=>bs.slice(n-m).forEach(b=>b.classList.add('gone')),1100);coverLater(items,3800);
   }else if(type==='SKIP'){ // 2ずつ・5ずつ・10ずつ
     const st=[2,5,10][rand(3)],s0=st*rand(st===10?5:st===5?6:8),miss=1+rand(3);const seq=[0,1,2,3].map(i=>s0+st*i);ans=seq[miss];nq.seq=seq;nq.step=st;
-    choices=choicesFor(ans,0,100,nOpt);if(!choices.includes(ans+st)&&ans+st<=100){choices[choices.findIndex(v=>v!==ans)]=ans+st;}
+    {const c=new Set([ans]);for(const v of shuffle([ans+st,ans-st,ans+2*st,ans-2*st,ans+3*st].filter(v=>v>=0&&v<=100))){if(c.size>=nOpt)break;c.add(v);}choices=shuffle([...c]);}
     prompt=st+' ずつ ふえるよ。？は？';talk=st+' ずつ ふえるよ。はてなに はいる かずは';
     for(let i=0;i<4;i++){const d=document.createElement('div');d.className='seq'+(i===miss?' q':'');d.style.setProperty('--i',i);d.textContent=i===miss?'？':seq[i];items.appendChild(d);}
   }else if(type==='CMP'){ // 2けたの 大小
@@ -598,7 +602,7 @@ function numLevelMsg(){
 function checkNum(v,b){
   if(nq.lock)return;
   if(v===nq.n){
-    nq.lock=true;clearPulse();b.classList.add('right');$('#numItems').classList.add('dance');$('#numItems').querySelectorAll('.hide').forEach(x=>x.classList.remove('hide'));{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
+    nq.lock=true;clearPulse();b.classList.add('right');$('#numItems').classList.add('dance');$('#numItems').classList.remove('covered');{const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2,24,8,false);}
     if(nq.miss<=1)state.prog.num++;
     state.numFail=nq.guided?(state.numFail||0)+1:0;
     const msg=numLevelMsg();
@@ -609,15 +613,15 @@ function checkNum(v,b){
     nq.miss++;shakeEl(b);sfx.ng();
     if(nq.miss>=2&&!nq.guided||nq.type==='CMP'){guide();return;}
     if(nq.type==='GIVE')say('いま '+v+' こ だよ。'+nq.n+' こ に してみよう');
-    else if(nq.type==='FLASH'){say('もう いちど みせるね');const it=$('#numItems').querySelectorAll('.item');it.forEach(x=>x.classList.remove('hide'));const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;it.forEach(x=>x.classList.add('hide'));nq.lock=false;},1500);}
-    else if(nq.type==='MAKE10')say('あいている ますを かぞえてみよう');
+    else if(nq.cover){say('もう いちど みせるね');const it=$('#numItems');it.classList.remove('covered');const qf=nq;nq.lock=true;setTimeout(()=>{if(nq!==qf)return;it.classList.add('covered');nq.lock=false;},nq.type==='FLASH'?1500:3000);}
+    else if(nq.type==='MAKE10')say('10 まで あと いくつかな。ゆびを つかっても いいよ');
     else say(['SEQ','SKIP'].includes(nq.type)?'じゅんばんに かずを いってみよう':nq.type==='B'?'もういちど かぞえてみよう':['MATH','THREE'].includes(nq.type)?'ゆびを つかっても いいよ':'もういちど ゆびで かぞえてみよう');
   }
 }
 /* 2回まちがえたら いっしょに考える（答えだけ教えず、考え方を見せる） */
 function guide(){
   nq.guided=true;nq.lock=true;const t=nq.type,q0=nq;const later=(fn,ms)=>setTimeout(()=>{if(nq===q0&&current==='numbers')fn();},ms);
-  const items=[...document.querySelectorAll('#numItems .item:not(.gone)')];items.forEach(x=>x.classList.remove('hide'));
+  $('#numItems').classList.remove('covered');const items=[...document.querySelectorAll('#numItems .item:not(.gone)')];
   if(['A','ADD','SUB','GIVE','FLASH','ADD20','SUB20'].includes(t)){
     items.forEach(b=>{b.classList.remove('on');b.lastChild.textContent='';});
     const target=t==='GIVE'?items.slice(0,nq.n):items;
@@ -628,7 +632,8 @@ function guide(){
       else{say('ぜんぶで '+nq.n+' こ。'+nq.n+' を おしてね',true);pulseChoice(nq.n);}
     },1200+target.length*(target.length>10?450:700)+400);
   }else if(t==='MAKE10'){
-    const cells=[...document.querySelectorAll('#numItems .cell')];say('あいている ますを かぞえよう');
+    const it=$('#numItems');it.innerHTML='';it.className='items';tenFrame(it,i=>i<nq.a?itemBtn(nq.emo,i):null);
+    const cells=[...it.querySelectorAll('.cell')];say('10の ますに ならべたよ。あいている ますを かぞえよう');
     cells.forEach((c,i)=>later(()=>{c.classList.add('cnt');c.textContent=i+1;sfx.step(i+1);say(String(i+1),true);},1200+i*700));
     later(()=>{nq.lock=false;say('あと '+nq.n+' で 10 だね',true);pulseChoice(nq.n);},1200+cells.length*700+400);
   }else if(t==='B'){say('この カードだよ。いっしょに かぞえてみよう');pulseChoice(nq.n);nq.lock=false;}
@@ -804,7 +809,7 @@ function step(t){
     drawMaze();
     if(t===mz.goal&&mz.got.size<mz.gems.length){say('ほしを ぜんぶ あつめてから ゴールしてね');sfx.ng();return;}
     if(t===mz.goal){mz.done=true;mz.drag=false;{const r=cv.getBoundingClientRect(),[gx2,gy2]=ctr(t);burst(r.left+gx2,r.top+gy2,40,9,false);}state.prog.maze++;let msg=mz.usedHint?'ヒントを つかって ゴールできたね！':mz.dead?'いきどまりから もどって ゴールできたね！':'まよわずに いけたね！';
-      const smooth=mz.dead<=4&&!mz.usedHint,hard=mz.dead>=6||mz.usedHint;
+      const smooth=mz.dead<=(state.level.maze>=7&&!mz.fog?2:4)&&!mz.usedHint,hard=mz.dead>=6||mz.usedHint;
       state.mzAdj=hard?Math.max(-0.5,(state.mzAdj||0)-0.25):mz.dead<=1?Math.min(0,(state.mzAdj||0)+0.25):(state.mzAdj||0);
       state.mzGood=smooth?(state.mzGood||0)+1:0;state.mzBad=mz.usedHint?(state.mzBad||0)+1:0;
       if(state.mzBad>=2&&state.level.maze>1){state.level.maze--;state.mzBad=0;state.mzGood=0;}
@@ -862,7 +867,7 @@ function pieceEl(p){
   if(pz.cf.card){d.className='piece ncard';d.textContent=p.kana;bindPiece(d,p);return d;}
   d.className='piece';
   const s=el('svg',{viewBox:[p.b[0],p.b[1],w,h].join(' ')});s.appendChild(el('path',{d:p.d,fill:p.color}));
-  if(pz.cf.name){const t=el('text',{x:p.lx,y:p.ly,class:'plbl','font-size':fsOf(p)});t.textContent=p.kana;s.appendChild(t);}d.appendChild(s);
+  if(pz.cf.name&&!pz.cf.rot){const t=el('text',{x:p.lx,y:p.ly,class:'plbl','font-size':fsOf(p)});t.textContent=p.kana;s.appendChild(t);}d.appendChild(s);
   if(pz.cf.rot)setRot(d,1+rand(3));
   bindPiece(d,p);return d;
 }
@@ -874,7 +879,7 @@ function fillDock(){
     const pe=pieceEl(p);slot.append(pe);
     if(pz.cf.name){const nm=document.createElement('div');nm.className='pname';nm.textContent=p.kana;slot.append(nm);}
     if(pz.cf.rot){const rb=document.createElement('button');rb.className='rotbtn';rb.textContent='↻';rb.setAttribute('aria-label','まわす');
-      rb.onclick=e=>{e.stopPropagation();if(!pe.isConnected)return;setRot(pe,(+pe.dataset.rot||0)+1);sfx.tick();if(+pe.dataset.rot===0)say('この むきかな？');};slot.append(rb);}
+      rb.onclick=e=>{e.stopPropagation();if(!pe.isConnected)return;setRot(pe,(+pe.dataset.rot||0)+1);sfx.tick();};slot.append(rb);}
     tray.appendChild(slot);}
   sizeDock();
 }
@@ -900,9 +905,10 @@ function sizeDock(){
 function armHint(){clearTimeout(hintT);hintT=setTimeout(()=>{
   if(current!=='puzzle'||!pz||!$('#ov').hidden)return armHint();
   if(pz.quiz)return;const d=pz.sel||$('#tray .slot > .piece');if(!d)return;const g=pz.ghost[d.dataset.id],p=pieceOf(d);
+  pz.hintN=pz.hintN||{};const hn=pz.hintN[p.id]=(pz.hintN[p.id]||0)+1;
   say('ヒント。'+p.kana+' は '+spatialHint(p));
   d.classList.remove('wiggle','wobble');void d.offsetWidth;d.classList.add('wiggle');
-  g.classList.remove('blink');void g.getBBox();g.classList.add('blink');
+  if(pz.lv<=2||hn>=2){g.classList.remove('blink');void g.getBBox();g.classList.add('blink');}
   setTimeout(()=>{d.classList.remove('wiggle');g.classList.remove('blink');},3600);armHint();
 },10000);}
 function pieceOf(d){return pz.G.pieces.find(q=>q.id===d.dataset.id);}

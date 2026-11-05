@@ -220,6 +220,8 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .sgrid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px;align-content:start;padding:4px}
 .sticker.got{animation:popin .5s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*40ms)}
 .sticker{aspect-ratio:1;max-width:100%;border-radius:24px;background:var(--paper);display:grid;place-items:center;font-size:56px}
+.sgh{grid-column:1/-1;font-size:20px;font-weight:800;padding:10px 4px 0;color:var(--ink)}
+.sgh.comp{color:var(--tomato)}
 .sticker.no{background:transparent;border:3px dashed var(--line);color:var(--line);font-size:34px;font-weight:800}
 
 /* overlays */
@@ -375,7 +377,17 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 <script>
 (function(){
 const KEY='asobibako-v1';
-const STICKERS=['🦁','🐼','🦒','🐘','🦖','🚒','🚀','🌈','🍉','🍦','🐳','🦄','🚂','🐞','🦋','🌻','🍰','🚜','🐙','🦊','🎈','⛄','🐸','🚁'];
+/* シールちょうの ページ（いままでの 24まいは そのまま ふくまれる） */
+const STK_GROUPS=[
+  ['どうぶつ',['🦁','🐼','🦒','🐘','🦊','🐸','🐶','🐱','🐰','🐻','🐨','🐯','🐮','🐷','🐵','🦓','🦛','🦘','🐧','🦉','🐿️','🦔']],
+  ['きょうりゅう・ゆめ',['🦖','🦕','🦄','🐉','🧚','🧜','🦸','🧙','👻','🤖']],
+  ['のりもの',['🚒','🚀','🚂','🚜','🚁','🚗','🚌','🚑','🚓','🚕','🚲','🛵','✈️','🚢','🚤','🚃','🚄','🛸','🏎️','🚛']],
+  ['たべもの',['🍉','🍦','🍰','🍎','🍓','🍌','🍇','🍑','🍒','🍙','🍣','🍕','🍔','🍩','🍪','🍫','🍭','🥕','🌽','🍞']],
+  ['うみ・むし',['🐳','🐙','🐞','🦋','🐬','🐟','🐠','🦀','🦈','🐢','🐌','🐝','🐜','🐛','🦑']],
+  ['しぜん・そら',['🌈','🌻','⛄','🌙','⭐','☀️','🌷','🌸','🍀','🍄','🌵','🌋','❄️','⚡','🌊']],
+  ['あそび',['🎈','⚽','🎨','🎵','🧸','🪁','🎁','🏆','🎪','🎡','🎢','🪀']]
+];
+const STICKERS=STK_GROUPS.flatMap(g=>g[1]);
 const ITEMS=['🍎','🍓','🐟','🚗','⭐','🐤','🍩','🌷','🍌','🐞'];
 const MAX={num:15,maze:20,puz:8};
 /* ちずパズルの レベル：color=ピースの色のヒント name=名前を表示 rot=向きが回っている nob=県の境目なし card=名前カードだけ */
@@ -448,7 +460,9 @@ function refresh(){
   $('#mzLv').textContent='レベル '+state.level.maze;
   $('#pzLv').textContent='レベル '+state.level.puz;
   const g=$('#sgrid');g.innerHTML='';
-  STICKERS.forEach((s,i)=>{const d=document.createElement('div');const has=state.stickers.includes(s);d.className='sticker'+(has?' got':' no');d.style.setProperty('--i',i);d.textContent=has?s:'？';g.appendChild(d);});
+  let si=0;STK_GROUPS.forEach(([name,list])=>{const n=list.filter(x=>state.stickers.includes(x)).length;
+    const h=document.createElement('div');h.className='sgh'+(n===list.length?' comp':'');h.textContent=name+'　'+n+' / '+list.length+(n===list.length?'　コンプリート！':'');g.appendChild(h);
+    list.forEach(s=>{const d=document.createElement('div');const has=state.stickers.includes(s);d.className='sticker'+(has?' got':' no');d.style.setProperty('--i',Math.min(si++,30));d.textContent=has?s:'？';g.appendChild(d);});});
   $('#stkCount').textContent=state.stickers.length+' / '+STICKERS.length;
 }
 
@@ -469,6 +483,7 @@ function celebrate(title,msg,next,pre){
   state.stars++;
   let stk=null;
   if(state.stars%3===0){const rest=STICKERS.filter(s=>!state.stickers.includes(s));if(rest.length){stk=rest[rand(rest.length)];state.stickers.push(stk);}}
+  if(stk){const grp=STK_GROUPS.find(g=>g[1].includes(stk));if(grp&&grp[1].every(x=>state.stickers.includes(x)))msg=(msg?msg+' ':'')+'「'+grp[0]+'」の シールが コンプリート！';}
   save();refresh();
   $('#ovTitle').textContent=title;$('#ovMsg').textContent=msg||'';
   $('#ovStk').hidden=!stk;if(stk)$('#ovStkE').textContent=stk;

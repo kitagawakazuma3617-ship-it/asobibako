@@ -298,37 +298,44 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .cnum.sm{width:clamp(70px,10vw,96px);height:clamp(70px,10vw,96px);font-size:clamp(38px,6vw,56px)}
 .cnum:active{transform:translateY(4px);box-shadow:0 2px 0 var(--line)}
 
-/* せんで むすぼう */
-.mu{position:relative;flex:1;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) 70px minmax(0,1fr);touch-action:none}
-.muRow{display:flex;gap:14px;justify-content:center;min-height:0;min-width:0}
-.muCell{position:relative;flex:1 1 0;max-width:230px;min-width:0;min-height:0;background:var(--paper);border-radius:22px;box-shadow:0 5px 0 var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px;
-  animation:popin .4s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*70ms);cursor:pointer}
-.muCell.sel{box-shadow:0 0 0 5px var(--sun),0 5px 0 var(--line)}
+/* せんで むすぼう：うえと したの あいだを ひろく とって、てんから てんへ ゆびで せんを ひく */
+.mu{position:relative;flex:1;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) minmax(140px,1.6fr) minmax(0,1fr);touch-action:none;-webkit-user-select:none;user-select:none}
+.mu.cnt{grid-template-rows:minmax(0,1fr) minmax(120px,1.1fr) minmax(0,1fr)}  /* かずを かぞえる レベルは カードを すこし おおきく */
+.muRow{display:flex;justify-content:space-evenly;min-height:0;min-width:0}
+.muCell{position:relative;flex:0 1 170px;min-width:0;min-height:0;background:var(--paper);border-radius:20px;box-shadow:0 5px 0 var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px;
+  animation:popin .4s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*70ms)}
+.muCell.sel,.muCell.hot{box-shadow:0 0 0 5px var(--sun),0 5px 0 var(--line)}
 .muCell.done{background:#EEF5FF}
-.muDot{position:absolute;left:50%;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:var(--tomato);box-shadow:0 0 0 4px var(--paper)}
+.muDot{position:absolute;left:50%;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:var(--tomato);box-shadow:0 0 0 5px var(--paper);transition:transform .12s;z-index:1}
+.muDot::before{content:'';position:absolute;inset:-20px;border-radius:50%}
+.muCell.sel .muDot,.muCell.hot .muDot{transform:scale(1.3);box-shadow:0 0 0 5px var(--sun)}
 .muCell.done .muDot{background:#3D7BE0}
-.muA .muDot{bottom:-33px}.muB .muDot{top:-33px}
-.muE{font-size:clamp(38px,8vmin,76px);line-height:1.1}
-.muT{font-size:clamp(14px,2.2vmin,20px);font-weight:800;color:var(--soft);white-space:nowrap}
-.muN{font-size:clamp(48px,10vmin,96px);font-weight:800;line-height:1}
+.muA .muDot{bottom:-23px}.muB .muDot{top:-23px}
+.muE{font-size:clamp(34px,7.5vmin,60px);line-height:1.1}
+.muT{font-size:clamp(13px,2.1vmin,18px);font-weight:800;color:var(--soft);white-space:nowrap}
+.muN{font-size:clamp(40px,9vmin,80px);font-weight:800;line-height:1}
 .muG{position:relative;width:100%;height:100%}
 .muG span{position:absolute;transform:translate(-50%,-50%);line-height:1}
 .muSvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.muSvg path{fill:none;stroke-linecap:round;stroke-width:6}
+.muSvg path{fill:none;stroke-linecap:round;stroke-width:7}
 .muSvg .ok{stroke:#3D7BE0}
-.muSvg .tmp{stroke:#3D7BE0;stroke-dasharray:2 12;opacity:.8}
+.muSvg .tmp{stroke:#3D7BE0;opacity:.75}
+.muSvg .back{animation:fadeOut .35s forwards}
 .muSvg .ng{stroke:var(--tomato);animation:fadeOut .9s forwards}
 @keyframes fadeOut{60%{opacity:1}to{opacity:0}}
+.muHand{position:absolute;z-index:3;font-size:46px;line-height:1;pointer-events:none;animation:muHand 1.4s ease-in-out 2 both}
+@keyframes muHand{0%{opacity:0;transform:translate(-45%,-8%)}15%{opacity:1;transform:translate(-45%,-8%)}75%{opacity:1;transform:translate(calc(-45% + var(--dx)),calc(-8% + var(--dy)))}100%{opacity:0;transform:translate(calc(-45% + var(--dx)),calc(-8% + var(--dy)))}}
 .shop{width:100%;height:100%;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;border:3px solid var(--tomato);background:#FFF8F0}
 .awn{height:16%;min-height:12px;background:repeating-linear-gradient(90deg,var(--tomato) 0 12%,#FFFFFF 12% 24%)}
-.sign{align-self:center;margin-top:4px;background:var(--tomato);color:#fff;font-weight:800;border-radius:8px;padding:1px 10px;font-size:clamp(14px,2.4vmin,22px);white-space:nowrap}
-.win{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:2px;font-size:clamp(22px,4.6vmin,42px);flex-wrap:wrap;line-height:1.1}
+.sign{align-self:center;margin-top:4px;background:var(--tomato);color:#fff;font-weight:800;border-radius:8px;padding:1px 10px;font-size:clamp(13px,2.3vmin,20px);white-space:nowrap}
+.win{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:2px;font-size:clamp(20px,4.2vmin,40px);flex-wrap:wrap;line-height:1.1}
 @media (orientation:portrait){
-  .mu{grid-template-rows:none;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr)}
+  .mu{grid-template-rows:none;grid-template-columns:minmax(0,1fr) minmax(120px,1.5fr) minmax(0,1fr)}
+  .mu.cnt{grid-template-rows:none;grid-template-columns:minmax(0,1fr) minmax(100px,1fr) minmax(0,1fr)}
   .muRow{flex-direction:column}
-  .muCell{max-width:none;max-height:200px}
-  .muA .muDot{bottom:auto;left:auto;top:50%;right:-33px;margin:-12px 0 0}
-  .muB .muDot{top:50%;left:-33px;margin:-12px 0 0}
+  .muCell{flex:0 1 150px;max-height:170px}
+  .muA .muDot{bottom:auto;left:auto;top:50%;right:-23px;margin:-17px 0 0}
+  .muB .muDot{top:50%;left:-23px;margin:-17px 0 0}
 }
 
 /* さがしもの */
@@ -356,11 +363,10 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .mnCap{font-size:18px;font-weight:800;color:var(--soft);background:var(--paper);border-radius:999px;padding:2px 14px}
 .mnBox svg{display:block;background:var(--paper);border-radius:12px;box-shadow:0 5px 0 var(--line);touch-action:none}
 .mnR{fill:#FFFFFF}
-.mnModel .mnR.on{fill:#F59A8A}
+.mnModel .mnR.on,.mnWork .mnR.on{fill:#F59A8A}  /* おてほんと ぬる ところは おなじ いろ */
 .mnWork .mnR{cursor:pointer}
-.mnWork .mnR.on{fill:#3D7BE0}
-.mnR.bad{stroke:var(--tomato);stroke-width:7;stroke-dasharray:10 7;animation:blink .6s 4}
-.mnL{fill:none;stroke:#E07A6A;stroke-width:3;pointer-events:none}
+.mnR.bad{stroke:var(--ink);stroke-width:8;stroke-dasharray:12 8;animation:blink .6s 4}
+.mnL{fill:none;stroke:#C85A46;stroke-width:3;pointer-events:none}
 .mnCover{position:absolute;left:0;right:0;bottom:0;top:34px;border-radius:12px;background:var(--sky);display:grid;place-items:center;font-size:56px;font-weight:800;color:var(--soft)}
 .mnMirror{align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--soft);font-weight:800;font-size:16px}
 .mnMirror i{flex:1;width:0;border-left:4px dashed var(--soft);max-height:70%}
@@ -1365,51 +1371,61 @@ function muFill(div,o){
   div.innerHTML='';pos.forEach(([x,y])=>{const s=H('span','',o.g);s.style.left=(x*100)+'%';s.style.top=(y*100)+'%';div.appendChild(s);});
   div.dataset.dice=(!o.sc&&o.c<=6)?'1':'';
 }
-function muSize(){document.querySelectorAll('.muG').forEach(d=>{const r={width:d.clientWidth,height:d.clientHeight};const f=d.dataset.dice?Math.min(r.width,r.height)/3.3:Math.min(r.width/4.3,r.height/3.3);d.style.fontSize=Math.max(14,f)+'px';});
-  /* えや すうじは カードの おおきさに あわせて おおきく */
-  document.querySelectorAll('.muCell').forEach(c=>{const w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;
-    const e=c.querySelector('.muE');if(e)e.style.fontSize=Math.round(Math.max(38,Math.min(w*.42,(h-40)*.62,112)))+'px';
-    const n=c.querySelector('.muN');if(n)n.style.fontSize=Math.round(Math.max(48,Math.min(w*.5,(h-20)*.7,130)))+'px';
-    const win=c.querySelector('.win');if(win&&win.children.length){const ks=win.children,k=ks.length,ww=win.clientWidth,wh=win.clientHeight;let f=Math.round(Math.max(18,Math.min((ww-8)/(k*1.3),(wh-4)/1.15,64)));win.style.fontSize=f+'px';
-      /* 1れつに おさまるまで ちいさく（たんまつの フォントの はばの ちがいに そなえる） */
-      for(let t=0;t<8&&f>18;t++){if(ks[k-1].offsetTop<=ks[0].offsetTop+2&&win.scrollHeight<=wh+1)break;f=Math.max(18,Math.round(f*.9));win.style.fontSize=f+'px';}}});}
+function muSize(){document.querySelectorAll('.muG').forEach(d=>{const w=d.clientWidth,h=d.clientHeight;if(!w||!h)return;const f=d.dataset.dice?Math.min(w,h)/3.3:Math.min(w/4.3,h/3.3);d.style.fontSize=Math.max(14,f)+'px';});
+  /* おみせの まどの しなものは 1れつに おさまる おおきさに（たんまつの フォントの はばの ちがいにも そなえる） */
+  document.querySelectorAll('.muCell .win').forEach(win=>{const ks=win.children,k=ks.length,ww=win.clientWidth,wh=win.clientHeight;if(!k||!ww||!wh)return;
+    let f=Math.round(Math.max(16,Math.min((ww-8)/(k*1.3),(wh-4)/1.15,40)));win.style.fontSize=f+'px';
+    for(let t=0;t<8&&f>16;t++){if(ks[k-1].offsetTop<=ks[0].offsetTop+2&&win.scrollHeight<=wh+1)break;f=Math.max(16,Math.round(f*.9));win.style.fontSize=f+'px';}});}
+let muDemo=0;
 CG.musubu={name:'せんで むすぼう',icon:'🔗',color:'#F2614B',max:8,praise:'よく みて むすべたね！',
   lv:['','なかよし','おなじ かず','おみせ','4つ むすぶ','おなじ かず 8まで','かずと すうじ','おみせ 5つ','おなじ かず 10まで'],
   start(lv,main,bot){
     const L=MU_LV[lv],th=Array.isArray(L.th)?pick(L.th):L.th,P=muPairs(th,L),n=P.length;
     const oa=shuffle(range(0,n-1));let ob;for(let t=0;t<60;t++){ob=shuffle(range(0,n-1));if(ob.every((v,i)=>v!==oa[i]))break;}
-    const mu=H('div','mu'),ra=H('div','muRow muA'),gap=H('div','muGap'),rb=H('div','muRow muB'),svg=SV('svg',{class:'muSvg'});
+    const mu=H('div','mu'+(th==='kazu'||th==='suuji'?' cnt':'')),ra=H('div','muRow muA'),gap=H('div','muGap'),rb=H('div','muRow muB'),svg=SV('svg',{class:'muSvg'});
     mu.append(ra,gap,rb,svg);main.appendChild(mu);
     const mk=(o,k,side,i)=>{const c=H('div','muCell',muFace(o));c.dataset.k=k;c.dataset.side=side;c.style.setProperty('--i',i);c.appendChild(H('div','muDot'));if(o.g)muFill(c.querySelector('.muG'),o);return c;};
     oa.forEach((k,i)=>ra.appendChild(mk(P[k].a,k,'a',i)));ob.forEach((k,i)=>rb.appendChild(mk(P[k].b,k,'b',i+n)));
-    const talk={naka:'なかよしの ものどうしを せんで むすんでね',kazu:'おなじ かずの ものどうしを せんで むすんでね',suuji:'かずと おなじ すうじを せんで むすんでね',mise:'どの おみせで うっているかな？ せんで むすんでね'}[th];
+    const talk={naka:'なかよしの ものどうしを',kazu:'おなじ かずの ものどうしを',suuji:'かずと おなじ すうじを',mise:'どの おみせで うっているかな？ しなものと おみせを'}[th]+'、てんから てんへ ゆびで せんを ひいて むすんでね';
     cPrompt({naka:'なかよしを <span class="kw">せんで むすぼう</span>',kazu:'<span class="kw">おなじ かず</span>を むすぼう',suuji:'かずと <span class="kw">すうじ</span>を むすぼう',mise:'どの <span class="kw">おみせ</span>で うっているかな？'}[th],talk);
-    const links=[];let sel=null,drag=null,tmp=null;const missK={};
+    const links=[];let drag=null,tmp=null,hot=null,taps=0;const missK={};
     const dotPt=c=>{const d=c.querySelector('.muDot').getBoundingClientRect(),m=mu.getBoundingClientRect();return[d.left+d.width/2-m.left,d.top+d.height/2-m.top];};
     const pathD=(p,q,bend)=>{const mx=(p[0]+q[0])/2+bend[0],my=(p[1]+q[1])/2+bend[1];return 'M'+p[0]+' '+p[1]+' Q'+mx+' '+my+' '+q[0]+' '+q[1];};
     const redraw=()=>{svg.querySelectorAll('path.ok').forEach(x=>x.remove());links.forEach(l=>{svg.appendChild(SV('path',{class:'ok',d:pathD(dotPt(l.a),dotPt(l.b),l.bend)}));});muSize();};
     const speakCell=c=>{const k=+c.dataset.k,o=c.dataset.side==='a'?P[k].a:P[k].b;if(o.shop)say(o.shop.n);else if(o.num!=null)say(String(o.num));else if(o.t)say(o.t);};
-    const setSel=c=>{if(sel)sel.classList.remove('sel');sel=c;if(c){c.classList.add('sel');speakCell(c);sfx.tick();}};
-    const tryLink=(x,y)=>{const a=x.dataset.side==='a'?x:y,b=a===x?y:x;setSel(null);
+    const setHot=c=>{if(hot===c)return;if(hot)hot.classList.remove('hot');hot=c;if(c){c.classList.add('hot');sfx.tick();}};
+    /* ゆびの さきに ある あいて：はんたいがわの まだ つないでいない てん（まわりを ひろめに とる）か、その カード */
+    const targetAt=(x,y,from)=>{const m=mu.getBoundingClientRect(),px=x-m.left,py=y-m.top;let best=null,bd=1e9;
+      mu.querySelectorAll('.muCell').forEach(c=>{if(c.dataset.side===from.dataset.side||c.classList.contains('done'))return;const p=dotPt(c),d=Math.hypot(p[0]-px,p[1]-py);if(d<bd){bd=d;best=c;}});
+      if(best&&bd<=52)return best;
+      const t=document.elementFromPoint(x,y),c=t&&t.closest&&t.closest('.muCell');
+      return c&&c.dataset.side!==from.dataset.side&&!c.classList.contains('done')?c:null;};
+    const tryLink=(x,y)=>{const a=x.dataset.side==='a'?x:y,b=a===x?y:x;
       if(a.dataset.k===b.dataset.k){a.classList.add('done');b.classList.add('done');a.classList.remove('hintpulse');b.classList.remove('hintpulse');
-        links.push({a,b,bend:[(Math.random()-.5)*30,(Math.random()-.5)*30]});redraw();sfx.snap();cSpark(b,12);
+        links.push({a,b,bend:[(Math.random()-.5)*24,(Math.random()-.5)*24]});redraw();sfx.snap();cSpark(b,12);
         if(links.length===n)cWin();return;}
       cMiss();const p=SV('path',{class:'ng',d:pathD(dotPt(a),dotPt(b),[0,0])});svg.appendChild(p);setTimeout(()=>p.remove(),950);cShake(a);cShake(b);
       const k=a.dataset.k;missK[k]=(missK[k]||0)+1;
       if(missK[k]>=2){cq.guided=true;const pb=rb.querySelector('[data-k="'+k+'"]');cPulse(a,5000);cPulse(pb,5000);say('ひかっている ものどうしが なかまだよ。むすんでみよう');}
       else say(pick(['ちがうみたい。もう いちど よく みてね','あれ？ よく みてごらん']));};
-    const onCell=c=>{if(!c||c.classList.contains('done')||cq.won)return;
-      if(!sel){setSel(c);return;}if(sel===c){setSel(null);return;}if(sel.dataset.side===c.dataset.side){setSel(c);return;}tryLink(sel,c);};
-    mu.addEventListener('pointerdown',e=>{const c=e.target.closest('.muCell');if(!c||c.classList.contains('done')||cq.won)return;e.preventDefault();
-      drag={c,x:e.clientX,y:e.clientY,moved:false};try{mu.setPointerCapture(e.pointerId);}catch(_){}});
-    mu.addEventListener('pointermove',e=>{if(!drag)return;if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>14){drag.moved=true;if(sel!==drag.c)setSel(drag.c);}
-      if(drag.moved){const m=mu.getBoundingClientRect();if(!tmp){tmp=SV('path',{class:'tmp'});svg.appendChild(tmp);}tmp.setAttribute('d',pathD(dotPt(drag.c),[e.clientX-m.left,e.clientY-m.top],[0,0]));}});
-    const end=e=>{if(!drag)return;const d=drag;drag=null;if(tmp){tmp.remove();tmp=null;}
-      if(!d.moved){onCell(d.c);return;}
-      const t=document.elementFromPoint(e.clientX,e.clientY),c2=t&&t.closest&&t.closest('.muCell');
-      if(c2&&c2!==d.c&&c2.dataset.side!==d.c.dataset.side&&!c2.classList.contains('done'))tryLink(d.c,c2);};
-    mu.addEventListener('pointerup',end);mu.addEventListener('pointercancel',()=>{drag=null;if(tmp){tmp.remove();tmp=null;}});
+    /* タップでは つながらない。てんから てんへ ゆびを うごかして せんを ひく（カードから はじめても よい） */
+    const clear=()=>{if(drag)drag.c.classList.remove('sel');drag=null;setHot(null);};
+    mu.addEventListener('pointerdown',e=>{if(drag||cq.won)return;const c=e.target.closest('.muCell');if(!c||c.classList.contains('done'))return;e.preventDefault();
+      drag={c,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};c.classList.add('sel');try{mu.setPointerCapture(e.pointerId);}catch(_){}});
+    mu.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
+      if(!drag.moved){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<10)return;drag.moved=true;tmp=SV('path',{class:'tmp'});svg.appendChild(tmp);}
+      const m=mu.getBoundingClientRect();setHot(targetAt(e.clientX,e.clientY,drag.c));
+      tmp.setAttribute('d',pathD(dotPt(drag.c),[e.clientX-m.left,e.clientY-m.top],[0,0]));});
+    mu.addEventListener('pointerup',e=>{if(!drag||e.pointerId!==drag.id)return;const d=drag,t=d.moved?targetAt(e.clientX,e.clientY,d.c):null;clear();
+      if(tmp){const p=tmp;tmp=null;if(t)p.remove();else{p.classList.add('back');setTimeout(()=>p.remove(),350);}}
+      if(!d.moved){speakCell(d.c);taps++;if(taps===2||taps%5===0)say('てんから てんへ、ゆびを はなさずに せんを ひいてね',true);return;}
+      if(t)tryLink(d.c,t);});
+    mu.addEventListener('pointercancel',e=>{if(!drag||e.pointerId!==drag.id)return;clear();if(tmp){tmp.remove();tmp=null;}});
     cq.relayout=redraw;requestAnimationFrame(muSize);setTimeout(muSize,450);
+    /* はじめの 2かいは ゆびの おてほん。こたえの ほうへは むけず、とちゅうまで うごかす */
+    if(lv<=2&&muDemo<2){muDemo++;cLater(()=>{const a=ra.querySelector('.muCell:not(.done)'),b=rb.querySelector('.muCell');if(!a||!b||drag||links.length)return;
+      const p=dotPt(a),q=dotPt(b),port=cPort(),hd=H('div','muHand','👆');hd.style.left=p[0]+'px';hd.style.top=p[1]+'px';
+      hd.style.setProperty('--dx',(port?(q[0]-p[0])*.45:0)+'px');hd.style.setProperty('--dy',(port?0:(q[1]-p[1])*.45)+'px');mu.appendChild(hd);cLater(()=>hd.remove(),3000);},800);}
     let hn=0;cIdle(()=>{const a=[...ra.querySelectorAll('.muCell:not(.done)')][0];if(!a)return;hn++;const k=a.dataset.k;
       if(hn===1){cPulse(a,4000);say(P[k].hint);}else{cq.guided=true;cPulse(a,5000);cPulse(rb.querySelector('[data-k="'+k+'"]'),5000);say('ひかっている ものどうしを むすんでみよう');}},20000);
   }};
@@ -1528,7 +1544,7 @@ CG.mane={name:'おてほんと おなじ',icon:'🖼️',color:'#8A63D2',max:6,p
       const bad=regs.filter(g=>got.has(g.id)!==exp.has(g.id));
       if(!bad.length){sw.querySelectorAll('.mnR.on').forEach(p=>p.classList.remove('bad'));cSpark(sw,30);cWin();return;}
       checks++;cMiss();cShake(sw);
-      if(checks>=2){cq.guided=true;bad.forEach(g=>sw.querySelector('[data-id="'+g.id+'"]').classList.add('bad'));say('ちがう ところに あかい しるしを つけたよ。'+(L.mir?'かがみだと みぎと ひだりが はんたいだよ':'おてほんと くらべてみよう'));
+      if(checks>=2){cq.guided=true;bad.forEach(g=>sw.querySelector('[data-id="'+g.id+'"]').classList.add('bad'));say('ちがう ところに しるしを つけたよ。'+(L.mir?'かがみだと みぎと ひだりが はんたいだよ':'おてほんと くらべてみよう'));
         cLater(()=>sw.querySelectorAll('.mnR.bad').forEach(p=>p.classList.remove('bad')),3600);}
       else say('ちがう ところが '+bad.length+'つ あるよ。'+(L.mir?'かがみだと、ひだりと みぎが はんたいに なるよ':'おてほんと よく くらべてみよう'));};
     if(L.mem){const cover=H('div','mnCover','？');cover.hidden=true;bm.appendChild(cover);

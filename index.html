@@ -355,6 +355,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .sgIt.mark::before{content:"✓";position:absolute;right:8%;top:4%;width:24px;height:24px;border-radius:50%;background:var(--sun);color:var(--ink);font-size:16px;font-weight:800;display:grid;place-items:center;z-index:1}
 .sgIt.num::before{content:attr(data-n);position:absolute;right:6%;top:2%;width:28px;height:28px;border-radius:50%;background:var(--tomato);color:#fff;font-size:17px;font-weight:800;display:grid;place-items:center;z-index:1}
 .sgIt.hintpulse::after{border-radius:50%}
+.sgPair{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sgPair.col{grid-template-columns:none;grid-template-rows:1fr 1fr}
+.sgTg.mini{min-height:0;gap:8px}.sgTg.mini .sgChip{width:42px;height:42px;font-size:24px;border-radius:12px}.sgTg.mini .sgChip.q{font-size:22px}.sgTg.mini .sgChip.got::after{width:20px;height:20px;font-size:13px;right:-6px;top:-6px}
 .sgCover{position:absolute;inset:0;border-radius:20px;background:var(--sky);display:grid;place-items:center;font-size:clamp(28px,5vw,48px);font-weight:800;color:var(--soft);z-index:2}
 
 /* おてほんと おなじ */
@@ -1447,19 +1450,27 @@ const SG_POOL=['🍎','🍊','🍌','🍇','🍓','🍉','🍑','🍍','🥝','�
 const SG_SIM=[['🍎','🍅','🍒'],['🍊','🍋','🍑'],['🐶','🐺','🦊'],['🐱','🐯','🦁'],['🐮','🐷','🐗'],['🚗','🚕','🚓'],['🚌','🚎','🚐'],['⚽','🏀','⚾'],
  ['🌷','🌹','🌺'],['🐟','🐠','🐡'],['🍦','🍧','🍨'],['🍰','🧁','🎂'],['🐤','🐥','🐣'],['🌙','🌛','🌜'],['🐻','🐨','🐼'],['🐰','🐹','🐭']];
 const SG_NAME={'🍎':'りんご','🍊':'みかん','🐶':'いぬ','🐱':'ねこ','🚗':'くるま','⚽':'ボール','🌷':'チューリップ','🐟':'さかな','🍦':'ソフトクリーム','🐤':'ひよこ','🐻':'くま','🐰':'うさぎ','🍰':'ケーキ','🚌':'バス'};
-const SG_LV=[null,{r:3,c:4,k:2},{r:4,c:4,k:3},{r:4,c:5,k:3,sim:1},{r:5,c:6,k:4,sim:1,rot:1},{r:4,c:5,k:3,sim:1,mem:1},{r:4,c:5,cnt:1,sim:1}];
+const SG_LV=[null,{r:3,c:4,k:2},{r:4,c:4,k:3},{r:4,c:5,k:3,sim:1},{r:5,c:6,k:4,sim:1,rot:1},{r:4,c:5,k:3,sim:1,mem:1},{r:4,c:5,cnt:1,sim:1},
+ {r:4,c:6,odd:3},                          /* ひとつだけ ちがう：にた えの なかから 1つを みつける（3まい） */
+ {r:4,c:6,k:4,sim:1,rot:1,mem:1},          /* たくさんの なかから おぼえて さがす */
+ {r:4,c:6,cnt:1,sim:1,rot:1,hi:1},         /* むきが ばらばらの なかで かぞえる（6〜11こ） */
+ {r:4,c:4,diff:3}];                        /* 2まいの えの ちがいを 3つ みつける */
+/* ひとつだけ ちがう：ちがいが ちいさいけれど よく みれば わかる くみあわせ */
+const SG_ODD=[['🌛','🌜'],['🐤','🐥'],['🍦','🍨'],['🚗','🚕'],['🚓','🚗'],['🍊','🍋'],['🐟','🐠'],['🐶','🐺'],['🐱','🐯'],['🌷','🌹'],['🐻','🐨'],['🐰','🐹'],['🍎','🍅'],['🚌','🚎'],['🍰','🧁'],['⚽','🏀'],['🐮','🐷'],['🌸','🌼'],['⭐','🌟'],['🍙','🍘'],['👟','👞'],['🐧','🐦']];
 function sgRegion(idx,R,C){const r=(idx/C)|0,c=idx%C;const v=r<R/3?'うえ':r>=R*2/3?'した':'まんなか',h=c<C/3?'ひだり':c>=C*2/3?'みぎ':'まんなか';
   if(v==='まんなか'&&h==='まんなか')return 'まんなかの あたり';if(v==='まんなか')return h+'の ほう';if(h==='まんなか')return v+'の ほう';return h+'の '+v+'の ほう';}
-CG.sagasu={name:'さがしもの',icon:'🔍',color:'#2FAE7E',max:6,praise:'よく みつけたね！',
-  lv:['','さがしもの','3つ さがす','にている ものに ちゅうい','たくさんの なかから','おぼえて さがす','いくつ あるかな'],
+CG.sagasu={name:'さがしもの',icon:'🔍',color:'#2FAE7E',max:10,praise:'よく みつけたね！',
+  lv:['','さがしもの','3つ さがす','にている ものに ちゅうい','たくさんの なかから','おぼえて さがす','いくつ あるかな','ひとつだけ ちがう','たくさん おぼえる','ばらばらを かぞえる','まちがいさがし'],
   start(lv,main,bot){
     const L=SG_LV[lv];let R=L.r,C=L.c;if(cPort()){[R,C]=[C,R];}const N=R*C;
+    if(L.odd)return sgOdd(L,R,C,main);
+    if(L.diff)return sgDiff(L,main);
     const sg=H('div','sg'),tgBox=H('div','sgTg'),scene=H('div','sgScene');sg.append(tgBox,scene);main.appendChild(sg);
     scene.style.gridTemplateColumns='repeat('+C+',minmax(0,1fr))';scene.style.gridTemplateRows='repeat('+R+',minmax(0,1fr))';
     let items=[],tg=[],cnt=0,t0=null;
     if(L.cnt){
-      t0=pick(Object.keys(SG_NAME));const grp=SG_SIM.find(g=>g.includes(t0))||[t0];cnt=3+rand(6);
-      const sib=grp.filter(x=>x!==t0);items=Array(cnt).fill(t0);for(let i=0;i<3+rand(2);i++)items.push(pick(sib));
+      t0=pick(Object.keys(SG_NAME));const grp=SG_SIM.find(g=>g.includes(t0))||[t0];cnt=L.hi?6+rand(6):3+rand(6);
+      const sib=grp.filter(x=>x!==t0);items=Array(cnt).fill(t0);for(let i=0,m=L.hi?5+rand(3):3+rand(2);i<m;i++)items.push(pick(sib));
       const fill=shuffle(SG_POOL.filter(x=>x!==t0&&!sib.includes(x)));let i=0;while(items.length<N)items.push(fill[i++%fill.length]);items=shuffle(items.slice(0,N));
     }else{
       let dis=[];
@@ -1511,6 +1522,54 @@ CG.sagasu={name:'さがしもの',icon:'🔍',color:'#2FAE7E',max:6,praise:'よ�
       cIdle(()=>say('ひとつずつ タッチして しるしを つけながら かぞえてみよう'),20000);
     }
   }};
+
+/* ひとつだけ ちがう：おなじ えが ならぶ なかに 1つだけ にた べつの え。3まい つづけて */
+function sgOdd(L,R,C,main){const N=R*C;const sg=H('div','sg'),tgBox=H('div','sgTg mini'),scene=H('div','sgScene');sg.append(tgBox,scene);main.appendChild(sg);
+  scene.style.gridTemplateColumns='repeat('+C+',minmax(0,1fr))';scene.style.gridTemplateRows='repeat('+R+',minmax(0,1fr))';
+  const size=()=>{const r=scene.getBoundingClientRect();scene.style.setProperty('--sfs',Math.max(18,Math.min((r.width-16)/C,(r.height-16)/R)*.66)+'px');};
+  cq.relayout=size;requestAnimationFrame(size);
+  let board=0,oi=-1,els=[],missB=0;const used=new Set();
+  const dots=()=>{tgBox.innerHTML='';tgBox.appendChild(H('span','lab','みつけた'));for(let i=0;i<L.odd;i++)tgBox.appendChild(H('div','sgChip'+(i<board?' got':' q'),i<board?'⭐':'？'));};
+  const play=()=>{missB=0;scene.innerHTML='';const rest=SG_ODD.filter((_,i)=>!used.has(i));const pi=SG_ODD.indexOf(pick(rest));used.add(pi);
+    const pr=shuffle(SG_ODD[pi].slice()),base=pr[0],odd=pr[1];oi=rand(N);cq.oddAt=oi;
+    els=[];for(let i=0;i<N;i++){const e=i===oi?odd:base;const d=H('div','sgIt','<span>'+e+'</span>');d.dataset.e=e;d.dataset.i=i;
+      d.firstChild.style.setProperty('--jx',((Math.random()-.5)*14)+'%');d.firstChild.style.setProperty('--jy',((Math.random()-.5)*10)+'%');scene.appendChild(d);els.push(d);}
+    dots();};
+  cPrompt('<span class="kw">ひとつだけ ちがう</span> えは どれ？','ひとつだけ ちがう えが あるよ。どれかな？');
+  scene.addEventListener('pointerdown',e=>{const d=e.target.closest('.sgIt');if(!d||cq.lock||cq.won)return;
+    if(+d.dataset.i===oi){d.classList.add('found');d.classList.remove('hintpulse');sfx.pop();cSpark(d,14);board++;dots();cq.lock=true;
+      if(board>=L.odd){say('ぜんぶ みつけたね');cq.lock=false;cWin();return;}
+      say(pick(['みつけた！','よく みつけたね','そのとおり！']));cLater(()=>{cq.lock=false;play();},1000);return;}
+    cMiss();cShake(d);missB++;say(pick(['それは みんなと おなじだね','よく くらべてみよう']));
+    if(missB===2)say(sgRegion(oi,R,C)+'を よく みてごらん',true);
+    if(missB>=4&&!cq.guided){cq.guided=true;cPulse(els[oi],5000);say('ひかっている ところを みてごらん',true);}});
+  play();
+  cIdle(()=>say(sgRegion(oi,R,C)+'を よく みてごらん'),20000);}
+/* まちがいさがし：2まいの えの ちがう ところを 3つ */
+function sgDiff(L,main){const R=L.r,C=L.c,N=R*C,port=cPort();
+  const sg=H('div','sg'),tgBox=H('div','sgTg mini'),pair=H('div','sgPair'+(port?' col':'')),A=H('div','sgScene'),B=H('div','sgScene');pair.append(A,B);sg.append(tgBox,pair);main.appendChild(sg);
+  [A,B].forEach(x=>{x.style.gridTemplateColumns='repeat('+C+',minmax(0,1fr))';x.style.gridTemplateRows='repeat('+R+',minmax(0,1fr))';});
+  const base=shuffle(SG_POOL.slice()).slice(0,N);const pos=shuffle(range(0,N-1)).slice(0,L.diff);const right=base.slice();
+  /* 1つは にた もの（よく みないと わからない）、のこりは べつの もの */
+  pos.forEach((p,k)=>{const g=SG_SIM.find(g=>g.includes(base[p]));const alt=k===0?(g?pick(g.filter(x=>x!==base[p])):null):null;
+    right[p]=alt||pick(SG_POOL.filter(x=>!base.includes(x)&&!right.includes(x)));});
+  if(!SG_SIM.some(g=>g.includes(base[pos[0]]))){/* にた ものが ない ときは にた ものに いれかえる */const g=pick(SG_SIM);base[pos[0]]=g[0];right[pos[0]]=g[1];}
+  const mk=(sc,arr)=>arr.map((e,i)=>{const d=H('div','sgIt','<span>'+e+'</span>');d.dataset.i=i;d.dataset.e=e;sc.appendChild(d);return d;});
+  const ea=mk(A,base),eb=mk(B,right);
+  const size=()=>{[A,B].forEach(x=>{const r=x.getBoundingClientRect();x.style.setProperty('--sfs',Math.max(18,Math.min((r.width-16)/C,(r.height-16)/R)*.62)+'px');});};
+  cq.relayout=size;requestAnimationFrame(size);
+  const got=new Set();cq.diffs=pos;
+  const chips=()=>{tgBox.innerHTML='';tgBox.appendChild(H('span','lab','ちがい'));pos.forEach((_,i)=>tgBox.appendChild(H('div','sgChip'+(i<got.size?' got':' q'),i<got.size?'⭐':'？')));};chips();
+  cPrompt('<span class="kw">ちがう ところ</span>を '+L.diff+'つ みつけよう','ふたつの えで、ちがう ところが '+L.diff+'つ あるよ。みつけたら タッチしてね');
+  let missD=0;
+  const tap=e=>{const d=e.target.closest('.sgIt');if(!d||cq.lock||cq.won)return;const i=+d.dataset.i;
+    if(pos.includes(i)){if(got.has(i))return;got.add(i);ea[i].classList.add('found');eb[i].classList.add('found');ea[i].classList.remove('hintpulse');eb[i].classList.remove('hintpulse');sfx.pop();cSpark(eb[i],12);chips();missD=0;
+      if(got.size===pos.length){say('ぜんぶ みつけたね');cWin();}else say(pick(['みつけた！','あった！','よく みてるね']));return;}
+    cMiss();cShake(d);missD++;say(pick(['そこは おなじだよ','よく くらべてみよう']));
+    const left=pos.find(p=>!got.has(p));if(missD===2)say(sgRegion(left,R,C)+'を くらべてみて',true);
+    if(missD>=4&&!cq.guided){cq.guided=true;cPulse(ea[left],5000);cPulse(eb[left],5000);say('ひかっている ところを くらべてみよう',true);}};
+  A.addEventListener('pointerdown',tap);B.addEventListener('pointerdown',tap);
+  cIdle(()=>{const left=pos.find(p=>!got.has(p));if(left!=null)say(sgRegion(left,R,C)+'を くらべてみて');},20000);}
 
 /* --- おてほんと おなじ：まどの もようを おてほんと おなじに ぬる --- */
 const MN_LV=[null,{r:2,c:2,sp:'f',p:[2,2]},{r:3,c:3,sp:'f',p:[3,4]},{r:2,c:2,sp:'all',p:[3,4]},{r:4,c:4,sp:'x',p:[5,7]},{r:3,c:3,sp:'f',p:[3,4],mir:1},{r:3,c:3,sp:'x',p:[4,5],mem:1}];

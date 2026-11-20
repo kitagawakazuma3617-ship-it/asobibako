@@ -1684,7 +1684,9 @@ const sLast=w=>w[w.length-1];
 const SR_LV=[null,{st:3,k:2,lbl:1,hl:1},{st:4,k:3,lbl:1,hl:1},{st:4,k:3,lbl:1},{st:4,k:3},{st:4,k:3,trap:1},
  {grid:1,lbl:1,rc:[3,4],len:[5,6]},
  {grid:1,rc:[4,4],len:[6,7]},                     /* えだけの めいろ：なまえを じぶんで いう */
- {grid:1,rc:[4,5],len:[7,8],br:2,ntrap:1}];        /* わかれみち：いきどまりと 「ん」の わな。とちゅうで もどる */
+ {grid:1,rc:[4,5],len:[7,8],br:[1,2],ntrap:1},    /* わかれみち：いきどまりと 「ん」の わな。とちゅうで もどる */
+ {grid:1,rc:[4,6],len:[8,9],br:[1,2,2],ntrap:1,fk:3},   /* ひろい めいろ：わかれみちが 3つ */
+ {grid:1,rc:[4,6],len:[9,10],br:[2,3,3],ntrap:2,fk:4}];  /* ながい いきどまり：さきまで よんで えらぶ */
 function srChain(len,pool,trapNeed){
   for(let t=0;t<600;t++){const ch=[pick(pool.filter(w=>sLast(w.w)!=='ん'))];
     while(ch.length<len){const nx=pool.filter(w=>w.w[0]===sLast(ch[ch.length-1].w)&&sLast(w.w)!=='ん'&&!ch.includes(w));if(!nx.length)break;ch.push(pick(nx));}
@@ -1693,8 +1695,8 @@ function srChain(len,pool,trapNeed){
     return ch;}
   return null;}
 function srWordHTML(w,hl){return hl?w.slice(0,-1)+'<span class="srLast">'+sLast(w)+'</span>':w;}
-CG.shiri={name:'しりとり',icon:'🔤',color:'#E8619A',max:8,praise:'ことばを よく きいてたね！',
-  lv:['','しりとり','3つから えらぶ','さいごの おとを きく','えだけで えらぶ','「ん」に ちゅうい','しりとり めいろ','えだけの めいろ','わかれみち めいろ'],
+CG.shiri={name:'しりとり',icon:'🔤',color:'#E8619A',max:10,praise:'ことばを よく きいてたね！',
+  lv:['','しりとり','3つから えらぶ','さいごの おとを きく','えだけで えらぶ','「ん」に ちゅうい','しりとり めいろ','えだけの めいろ','わかれみち めいろ','ひろい めいろ','ながい いきどまり'],
   start(lv,main,bot){const L=SR_LV[lv];if(L.k===2)cq.strict=true;/* 2つから えらぶ レベルは ノーミスだけ かぞえる */if(L.grid)srGrid(main,bot,L);else srSteps(L,main);}};
 function srSteps(L,main){
   const pool=L.lbl?SWORDS:SWORDS.filter(w=>!w.amb);
@@ -1730,16 +1732,17 @@ function srSteps(L,main){
 function srNb(R,C){return i=>{const r=(i/C)|0,c=i%C,o=[];if(r>0)o.push(i-C);if(r<R-1)o.push(i+C);if(c>0)o.push(i-1);if(c<C-1)o.push(i+1);return o;};}
 function srOkMove(W,from,to){return !!W[to]&&W[to].w[0]===sLast(W[from].w)&&sLast(W[to].w)!=='ん';}
 function srCountPaths(W,nb,s,g){let cnt=0;const vis=new Set([s]);const dfs=i=>{if(cnt>1)return;if(i===g){cnt++;return;}for(const j of nb(i)){if(vis.has(j)||!srOkMove(W,i,j))continue;vis.add(j);dfs(j);vis.delete(j);}};dfs(s);return cnt;}
-function srBuild(R,C,len,nBr,nTrap,pool){
+function srBuild(R,C,len,brs,nTrap,pool,minFk){const nBr=brs.length;
   const N=R*C,nb=srNb(R,C);
   for(let t=0;t<4000;t++){const Ln=len[0]+rand(len[1]-len[0]+1);let path=null;
     for(let a=0;a<60&&!path;a++){const p=[rand(N)];while(p.length<Ln){const x=nb(p[p.length-1]).filter(y=>!p.includes(y));if(!x.length)break;p.push(pick(x));}if(p.length===Ln)path=p;}
     if(!path)continue;const ch=srChain(Ln,pool);if(!ch)continue;
     const W=Array(N).fill(null);path.forEach((c,i)=>W[c]=ch[i]);const used=new Set(ch);let made=0,ok=true;
-    /* いきどまりの わかれみち（2つめは 2マス さきまで のびる） */
+    /* いきどまりの わかれみち。brs の かずだけ マスを のばす */
     for(const b of shuffle(range(0,Ln-3))){if(made>=nBr)break;const fr=nb(path[b]).filter(x=>!W[x]);if(!fr.length)continue;
-      const c1=shuffle(pool.filter(w=>!used.has(w)&&w.w[0]===sLast(ch[b].w)&&sLast(w.w)!=='ん'));if(!c1.length)continue;const f=pick(fr);W[f]=c1[0];used.add(c1[0]);made++;
-      if(made===2){const fr2=nb(f).filter(x=>!W[x]),c2=shuffle(pool.filter(w=>!used.has(w)&&w.w[0]===sLast(W[f].w)&&sLast(w.w)!=='ん'));if(!fr2.length||!c2.length){ok=false;break;}const f2=pick(fr2);W[f2]=c2[0];used.add(c2[0]);}}
+      const c1=shuffle(pool.filter(w=>!used.has(w)&&w.w[0]===sLast(ch[b].w)&&sLast(w.w)!=='ん'));if(!c1.length)continue;let f=pick(fr);W[f]=c1[0];used.add(c1[0]);
+      for(let e=1;e<brs[made]&&ok;e++){const fr2=nb(f).filter(x=>!W[x]),c2=shuffle(pool.filter(w=>!used.has(w)&&w.w[0]===sLast(W[f].w)&&sLast(w.w)!=='ん'));if(!fr2.length||!c2.length){ok=false;break;}f=pick(fr2);W[f]=c2[0];used.add(c2[0]);}
+      made++;if(!ok)break;}
     if(!ok||made<nBr)continue;
     /* 「ん」の わな */
     let tm=0;for(const b of shuffle(range(1,Ln-2))){if(tm>=nTrap)break;const fr=nb(path[b]).filter(x=>!W[x]);const c=shuffle(SWORDS.filter(w=>!w.amb&&!used.has(w)&&w.w[0]===sLast(ch[b].w)&&sLast(w.w)==='ん'));if(!fr.length||!c.length)continue;W[pick(fr)]=c[0];used.add(c[0]);tm++;}
@@ -1750,13 +1753,13 @@ function srBuild(R,C,len,nBr,nTrap,pool){
     if(!ok||srCountPaths(W,nb,path[0],path[Ln-1])!==1)continue;
     /* こたえの みちで、えらべる ものが 2つ いじょう ある ばしょの かず */
     let forks=0;for(let k=0;k<Ln-1;k++){const vis=new Set(path.slice(0,k+1));const mv=nb(path[k]).filter(j=>!vis.has(j)&&W[j].w[0]===sLast(W[path[k]].w));if(mv.length>1)forks++;}
-    if((nBr+nTrap===0&&forks)||(nBr+nTrap>0&&forks<Math.min(2,nBr+nTrap)))continue;
+    if((nBr+nTrap===0&&forks)||(nBr+nTrap>0&&forks<(minFk||Math.min(2,nBr+nTrap))))continue;
     return {P:path,W};}
   return null;}
 function srGrid(main,bot,L){
   const port=cPort(),R=port?L.rc[1]:L.rc[0],C=port?L.rc[0]:L.rc[1],N=R*C,nb=srNb(R,C);
   const pool=L.lbl?SWORDS:SWORDS.filter(w=>!w.amb);
-  let B=srBuild(R,C,L.len,L.br||0,L.ntrap||0,pool);if(!B)B=srBuild(R,C,L.len,0,0,pool);
+  let B=srBuild(R,C,L.len,L.br||[],L.ntrap||0,pool,L.fk);if(!B)B=srBuild(R,C,L.len,[1,2],1,pool);if(!B)B=srBuild(R,C,L.len,[],0,pool);
   const P=B.P,W=B.W;
   const g=H('div','srGrid'+(L.lbl?'':' nolbl'));g.style.gridTemplateColumns='repeat('+C+',minmax(0,1fr))';g.style.gridTemplateRows='repeat('+R+',minmax(0,1fr))';
   const svg=SV('svg');g.appendChild(svg);main.appendChild(g);

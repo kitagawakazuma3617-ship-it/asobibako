@@ -315,6 +315,9 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .muT{font-size:clamp(13px,2.1vmin,18px);font-weight:800;color:var(--soft);white-space:nowrap}
 .muN{font-size:clamp(40px,9vmin,80px);font-weight:800;line-height:1}
 .muG{position:relative;width:100%;height:100%}
+.muAdd{display:flex;align-items:center;width:100%;height:100%;gap:2px}.muAdd .muG{flex:1;min-width:0;height:92%;background:#F3EEE4;border-radius:14px}
+.muPlus{flex:none;font-weight:800;color:var(--soft);font-size:clamp(13px,2.3vmin,20px)}
+.muE.sil{filter:brightness(0);opacity:.78}  /* かげ */
 .muG span{position:absolute;transform:translate(-50%,-50%);line-height:1}
 .muSvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .muSvg path{fill:none;stroke-linecap:round;stroke-width:7}
@@ -1357,7 +1360,15 @@ function muFresh(list,key,frac){const rec=muRec(),sc=x=>rec.lastIndexOf(key(x));
 function muRemember(keys){const rec=muRec();keys.forEach(k=>{const i=rec.indexOf(k);if(i>=0)rec.splice(i,1);rec.push(k);});if(rec.length>80)rec.splice(0,rec.length-80);}
 const COUNT_EMO=['🍓','🍬','🍩','🍎','🌷','⭐','🐟','🍪','🎈','🐞','🍊','🚗','🌰','🍙','🐤','🍇'];
 const DICE={1:[[1,1]],2:[[0,0],[2,2]],3:[[0,0],[1,1],[2,2]],4:[[0,0],[2,0],[0,2],[2,2]],5:[[0,0],[2,0],[1,1],[0,2],[2,2]],6:[[0,0],[2,0],[0,1],[2,1],[0,2],[2,2]]};
-const MU_LV=[null,{n:3,th:'naka'},{n:3,th:'kazu',lo:1,hi:5},{n:3,th:'mise'},{n:4,th:['naka','mise']},{n:4,th:'kazu',lo:2,hi:8,sc:1},{n:4,th:'suuji',lo:1,hi:9,sc:1},{n:5,th:'mise'},{n:5,th:'kazu',lo:5,hi:10,sc:1}];
+const MU_LV=[null,{n:3,th:'naka'},{n:3,th:'kazu',lo:1,hi:5},{n:3,th:'mise'},{n:4,th:['naka','mise']},{n:4,th:'kazu',lo:2,hi:8,sc:1},{n:4,th:'suuji',lo:1,hi:9,sc:1},{n:5,th:'mise'},{n:5,th:'kazu',lo:5,hi:10,sc:1},
+ {n:4,th:'kage'},{n:4,th:'tasu',lo:3,hi:7},{n:5,th:'kage',sim:1},{n:5,th:'tasu',lo:4,hi:10}];
+/* かげ あわせ：かたちが はっきり ちがう もの（かげの かさなりぐあいを その ばで はかって えらぶ） */
+const SIL=[['🐘','ぞう'],['🦒','きりん'],['🐇','うさぎ'],['🐈','ねこ'],['🐕','いぬ'],['🐎','うま'],['🐄','うし'],['🐓','にわとり'],['🦆','あひる'],['🦋','ちょうちょ'],['🐝','はち'],['🐙','たこ'],['🐬','いるか'],['🐳','くじら'],['🦀','かに'],['🦕','きょうりゅう'],['🐿️','りす'],['🐊','わに'],['🐫','らくだ'],['🦌','しか'],
+ ['✈️','ひこうき'],['🚁','ヘリコプター'],['🚲','じてんしゃ'],['⛵','ヨット'],['🚀','ロケット'],['🎸','ギター'],['☂️','かさ'],['🔑','かぎ'],['✂️','はさみ'],['🍌','バナナ'],['🌵','サボテン'],['👓','めがね'],['🍦','ソフトクリーム'],['🐟','さかな'],['🐍','へび'],['🐜','あり'],['🥕','にんじん'],['🔨','かなづち'],['🥄','スプーン'],['🚂','きかんしゃ'],['👑','おうかん'],['👟','くつ'],['🌙','つき'],['⭐','ほし']];
+const muMaskC={};
+function muMask(e){if(muMaskC[e])return muMaskC[e];const S=72,cv=document.createElement('canvas');cv.width=cv.height=S;const x=cv.getContext('2d');x.font='60px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,S/2,S/2+4);
+  const d=x.getImageData(0,0,S,S).data,a=new Uint8Array(S*S);for(let i=0;i<S*S;i++)a[i]=d[i*4+3]>100?1:0;return muMaskC[e]=a;}
+function muIoU(a,b){const p=muMask(a),q=muMask(b);let I=0,U=0;for(let k=0;k<p.length;k++){I+=p[k]&q[k];U+=p[k]|q[k];}return U?I/U:1;}
 function muPairs(th,L){
   const n=L.n,P=[];
   if(th==='naka'){let w=0;for(const r of muFresh(NAKA,r=>'n:'+r[0])){if(P.length>=n)break;if(r[4]==='w'){if(w)continue;w=1;}
@@ -1367,6 +1378,15 @@ function muPairs(th,L){
     const it=muFresh(m.p,x=>'i:'+x[0])[0],win=shuffle(m.p.filter(x=>x!==it).map(x=>x[0]).concat(m.d||[])).slice(0,3);
     P.push({a:{e:it[0],t:it[1]},b:{shop:m,s:win},hint:it[1]+'は どの おみせで うっているかな'});}
     muRemember(P.map(q=>'s:'+q.b.shop.n).concat(P.map(q=>'i:'+q.a.e)));}
+  else if(th==='kage'){let set=null;
+    /* やさしい ほうは かたちが ちがう ものだけ。むずかしい ほうは にた かたちの くみを ひとつ いれる（にすぎる ものは いれない） */
+    for(let t=0;t<400&&!set;t++){const c=(t<200?muFresh(SIL,x=>'k:'+x[0],.6).slice(0,n+4):shuffle(SIL.slice())).sort(()=>Math.random()-.5).slice(0,n);let mx=0;
+      for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)mx=Math.max(mx,muIoU(c[i][0],c[j][0]));
+      if(L.sim?(mx>=.55&&mx<.7):mx<.5)set=c;}
+    if(!set)set=shuffle(SIL.slice()).slice(0,n);
+    set.forEach(x=>P.push({a:{e:x[0],t:x[1]},b:{e:x[0],sil:1},hint:x[1]+'の かたちを よく みてごらん'}));muRemember(set.map(x=>'k:'+x[0]));}
+  else if(th==='tasu'){const tot=shuffle(range(L.lo,L.hi)).slice(0,n),emo=shuffle(COUNT_EMO.slice());
+    tot.forEach((s,i)=>{const lo=Math.max(1,s-5),hi=Math.min(5,s-1),x=lo+rand(hi-lo+1);P.push({a:{g:emo[i],add:[x,s-x]},b:{num:s},hint:'ふたつを あわせて かぞえてみよう'});});}
   else{const cnts=shuffle(range(L.lo,L.hi)).slice(0,n),emo=shuffle(COUNT_EMO.slice());
     cnts.forEach((c,i)=>P.push({a:{g:emo[i],c,sc:L.sc},b:th==='suuji'?{num:c}:{g:emo[n+i],c,sc:L.sc},hint:'かずを ひとつずつ かぞえてみよう'}));}
   return P;
@@ -1374,6 +1394,8 @@ function muPairs(th,L){
 function muFace(o){
   if(o.shop){const m=o.shop;return '<div class="shop"><div class="awn"></div><div class="sign">'+m.n+'</div><div class="win">'+o.s.map(x=>'<span>'+x+'</span>').join('')+'</div></div>';}
   if(o.num!=null)return '<div class="muN">'+o.num+'</div>';
+  if(o.add)return '<div class="muAdd"><div class="muG"></div><span class="muPlus">と</span><div class="muG"></div></div>';
+  if(o.sil)return '<div class="muE sil">'+o.e+'</div>';
   if(o.g)return '<div class="muG"></div>';
   return '<div class="muE">'+o.e+'</div><div class="muT">'+o.t+'</div>';
 }
@@ -1391,17 +1413,17 @@ function muSize(){document.querySelectorAll('.muG').forEach(d=>{const w=d.client
     let f=Math.round(Math.max(16,Math.min((ww-8)/(k*1.3),(wh-4)/1.15,40)));win.style.fontSize=f+'px';
     for(let t=0;t<8&&f>16;t++){if(ks[k-1].offsetTop<=ks[0].offsetTop+2&&win.scrollHeight<=wh+1)break;f=Math.max(16,Math.round(f*.9));win.style.fontSize=f+'px';}});}
 let muDemo=0;
-CG.musubu={name:'せんで むすぼう',icon:'🔗',color:'#F2614B',max:8,praise:'よく みて むすべたね！',
-  lv:['','なかよし','おなじ かず','おみせ','4つ むすぶ','おなじ かず 8まで','かずと すうじ','おみせ 5つ','おなじ かず 10まで'],
+CG.musubu={name:'せんで むすぼう',icon:'🔗',color:'#F2614B',max:12,praise:'よく みて むすべたね！',
+  lv:['','なかよし','おなじ かず','おみせ','4つ むすぶ','おなじ かず 8まで','かずと すうじ','おみせ 5つ','おなじ かず 10まで','かげ あわせ','あわせて いくつ','にた かげ','あわせて 10まで'],
   start(lv,main,bot){
     const L=MU_LV[lv],th=Array.isArray(L.th)?pick(L.th):L.th,P=muPairs(th,L),n=P.length;
     const oa=shuffle(range(0,n-1));let ob;for(let t=0;t<60;t++){ob=shuffle(range(0,n-1));if(ob.every((v,i)=>v!==oa[i]))break;}
-    const mu=H('div','mu'+(th==='kazu'||th==='suuji'?' cnt':'')),ra=H('div','muRow muA'),gap=H('div','muGap'),rb=H('div','muRow muB'),svg=SV('svg',{class:'muSvg'});
+    const mu=H('div','mu'+(th==='kazu'||th==='suuji'||th==='tasu'?' cnt':'')),ra=H('div','muRow muA'),gap=H('div','muGap'),rb=H('div','muRow muB'),svg=SV('svg',{class:'muSvg'});
     mu.append(ra,gap,rb,svg);main.appendChild(mu);
-    const mk=(o,k,side,i)=>{const c=H('div','muCell',muFace(o));c.dataset.k=k;c.dataset.side=side;c.style.setProperty('--i',i);c.appendChild(H('div','muDot'));if(o.g)muFill(c.querySelector('.muG'),o);return c;};
+    const mk=(o,k,side,i)=>{const c=H('div','muCell',muFace(o));c.dataset.k=k;c.dataset.side=side;c.style.setProperty('--i',i);c.appendChild(H('div','muDot'));if(o.add){const gs=c.querySelectorAll('.muG');muFill(gs[0],{g:o.g,c:o.add[0]});muFill(gs[1],{g:o.g,c:o.add[1]});}else if(o.g)muFill(c.querySelector('.muG'),o);return c;};
     oa.forEach((k,i)=>ra.appendChild(mk(P[k].a,k,'a',i)));ob.forEach((k,i)=>rb.appendChild(mk(P[k].b,k,'b',i+n)));
-    const talk={naka:'なかよしの ものどうしを',kazu:'おなじ かずの ものどうしを',suuji:'かずと おなじ すうじを',mise:'どの おみせで うっているかな？ しなものと おみせを'}[th]+'、てんから てんへ ゆびで せんを ひいて むすんでね';
-    cPrompt({naka:'なかよしを <span class="kw">せんで むすぼう</span>',kazu:'<span class="kw">おなじ かず</span>を むすぼう',suuji:'かずと <span class="kw">すうじ</span>を むすぼう',mise:'どの <span class="kw">おみせ</span>で うっているかな？'}[th],talk);
+    const talk={naka:'なかよしの ものどうしを',kazu:'おなじ かずの ものどうしを',suuji:'かずと おなじ すうじを',mise:'どの おみせで うっているかな？ しなものと おみせを',kage:'えと おなじ かたちの かげを',tasu:'ふたつを あわせた かずと おなじ すうじを'}[th]+'、てんから てんへ ゆびで せんを ひいて むすんでね';
+    cPrompt({naka:'なかよしを <span class="kw">せんで むすぼう</span>',kazu:'<span class="kw">おなじ かず</span>を むすぼう',suuji:'かずと <span class="kw">すうじ</span>を むすぼう',mise:'どの <span class="kw">おみせ</span>で うっているかな？',kage:'おなじ <span class="kw">かげ</span>を むすぼう',tasu:'<span class="kw">あわせて</span> いくつ？ すうじと むすぼう'}[th],talk);
     const links=[];let drag=null,tmp=null,hot=null,taps=0;const missK={};
     const dotPt=c=>{const d=c.querySelector('.muDot').getBoundingClientRect(),m=mu.getBoundingClientRect();return[d.left+d.width/2-m.left,d.top+d.height/2-m.top];};
     const pathD=(p,q,bend)=>{const mx=(p[0]+q[0])/2+bend[0],my=(p[1]+q[1])/2+bend[1];return 'M'+p[0]+' '+p[1]+' Q'+mx+' '+my+' '+q[0]+' '+q[1];};

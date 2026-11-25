@@ -462,6 +462,40 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 .mjCrayon small{font-size:15px;font-weight:800}
 .mjCrayon.on{transform:translateY(-10px);box-shadow:0 0 0 5px var(--cc),0 10px 0 var(--line)}
 @media (orientation:portrait){.mj{flex-direction:column}.mjRule{flex-direction:row;flex-wrap:wrap;justify-content:center}}
+/* ===== えいご ごっこ ===== */
+.t-eigo{background:#F08A24}
+.egNote{margin:0 0 10px;text-align:center;font-weight:800;color:var(--soft);font-size:clamp(14px,2.4vmin,20px)}
+.egGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.egStage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;position:relative}
+.egSide{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;min-height:0;opacity:.55;transition:opacity .25s,transform .25s}
+.egSide.on{opacity:1}
+.egWho{font-size:clamp(56px,13vmin,120px);line-height:1;transition:transform .25s}
+.egSide.on .egWho{animation:egBob 1.2s ease-in-out infinite}
+@keyframes egBob{50%{transform:translateY(-6px)}}
+.egName{font-weight:800;color:var(--soft);font-size:clamp(13px,2.2vmin,18px);background:var(--paper);border-radius:99px;padding:2px 12px}
+.egBub{position:relative;width:100%;max-width:440px;min-height:96px;background:var(--paper);border-radius:22px;box-shadow:0 5px 0 var(--line);padding:12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+.egBub::after{content:"";position:absolute;bottom:-14px;left:50%;margin-left:-12px;border:12px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.egSide:not(.on) .egBub{visibility:hidden}
+.egEn{font-size:clamp(26px,5.2vmin,46px);font-weight:800;color:var(--ink);line-height:1.15;font-family:"Arial Rounded MT Bold","Helvetica Rounded",Arial,sans-serif}
+.egEn .egSlot{color:#2C8C5F;border-bottom:4px dotted #2C8C5F;padding:0 4px}
+.egKana{font-size:clamp(13px,2.3vmin,19px);color:var(--soft);font-weight:800}
+.egJa{font-size:clamp(12px,2vmin,16px);color:var(--soft)}
+.egProp{min-height:48px;font-size:clamp(30px,6vmin,52px);display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.egProp span{animation:popin .4s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*90ms)}
+.egBottom{flex:none;display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;padding:8px 0 4px;min-height:96px}
+.egOpt{width:clamp(96px,18vmin,150px);height:clamp(96px,18vmin,150px);border-radius:24px;background:var(--paper);box-shadow:0 5px 0 var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;animation:popin .35s both cubic-bezier(.3,1.6,.5,1);animation-delay:calc(var(--i,0)*80ms)}
+.egOpt .e{font-size:clamp(40px,9vmin,72px);line-height:1}
+.egOpt .w{font-weight:800;color:var(--ink);font-size:clamp(14px,2.4vmin,20px)}
+.egOpt .train{width:70%;height:42%;border-radius:12px;display:grid;place-items:center;font-size:clamp(28px,6vmin,48px)}
+.egBtn{border-radius:99px;padding:14px 22px;font-weight:800;font-size:clamp(17px,3vmin,24px);background:var(--paper);box-shadow:0 5px 0 var(--line);color:var(--ink);display:flex;align-items:center;gap:8px}
+.egBtn.go{background:var(--leaf);color:#fff;font-size:clamp(20px,3.6vmin,30px);padding:16px 30px}
+.egBtn.rec.on{background:var(--tomato);color:#fff;animation:pulse 1s infinite}
+.egDots{display:flex;gap:6px;align-items:center}
+.egDots i{width:12px;height:12px;border-radius:50%;background:rgba(36,52,77,.15)}.egDots i.done{background:var(--leaf)}.egDots i.cur{background:var(--sun);transform:scale(1.3)}
+.egGo{position:absolute;left:0;right:0;bottom:30%;font-size:64px;animation:egGo 2.6s ease-in forwards;pointer-events:none;text-align:left}
+@keyframes egGo{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
+@media (orientation:portrait){.egStage{grid-template-columns:none;grid-template-rows:1fr 1fr}.egGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media (min-width:860px) and (orientation:landscape){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))!important}.tile b{font-size:clamp(20px,2.5vw,34px)!important}}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -495,6 +529,10 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
       <button class="tile t-chie" data-go="chie">
         <svg viewBox="0 0 100 100"><path fill="#fff" d="M50 12C33 12 21 25 21 41C21 52 27 59 33 65C36 68 37 71 37 74H63C63 71 64 68 67 65C73 59 79 52 79 41C79 25 67 12 50 12Z"/><rect x="38" y="78" width="24" height="7" rx="3" fill="#fff"/><rect x="41" y="88" width="18" height="6" rx="3" fill="#fff"/><path d="M43 52L50 60L57 52" stroke="#3D8FD6" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <b>ちえあそび</b><small class="lvchie">7つの あそび</small>
+      </button>
+      <button class="tile t-eigo" data-go="eigo">
+        <svg viewBox="0 0 100 100"><path fill="#fff" d="M14 22h56a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H44L26 82V68H14A10 10 0 0 1 4 58V32a10 10 0 0 1 10-10Z"/><text x="42" y="54" font-size="26" font-weight="800" text-anchor="middle" fill="#F08A24" font-family="Arial">ABC</text><circle cx="84" cy="80" r="12" fill="#fff"/></svg>
+        <b>えいご</b><small>ごっこあそび</small>
       </button>
     </div>
     <div class="homefoot">
@@ -545,6 +583,20 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <div class="prompt cprompt"><span id="cpPrompt"></span><button class="speak" id="cpSay" aria-label="もういちどきく"><svg width="28" height="28" viewBox="0 0 24 24"><path fill="#24344D" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="#24344D" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>
     <div class="cpmain" id="cpMain"></div>
     <div class="cpbottom" id="cpBottom"></div>
+  </section>
+
+  <!-- EIGO HUB -->
+  <section class="view" id="eigo" hidden>
+    <div class="bar"><button class="homebtn" data-go="home" aria-label="おうちにもどる"><svg width="34" height="34" viewBox="0 0 24 24"><path fill="#2FAE7E" d="M12 3l9 8h-2.5v9h-5v-6h-3v6h-5v-9H3z"/></svg></button><h1>えいご ごっこ</h1><div class="stars"><span>★</span><span class="starN">0</span><span class="p3"><i></i><i></i><i></i></span></div></div>
+    <p class="egNote">おうちの ひとと いっしょに、やくに なりきって えいごで おはなし しよう</p>
+    <div class="cgrid egGrid" id="egGrid"></div>
+  </section>
+
+  <!-- EIGO PLAY -->
+  <section class="view" id="eigoplay" hidden>
+    <div class="bar"><button class="homebtn backbtn" data-go="eigo" aria-label="ばめんを えらぶ"><svg width="34" height="34" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="#3D8FD6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="#F2614B"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="#2FAE7E"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="#FFC83A"/></svg></button><h1><span id="egTitle"></span></h1><div class="egDots" id="egDots"></div></div>
+    <div class="egStage" id="egStage"></div>
+    <div class="egBottom" id="egBottom"></div>
   </section>
 </div>
 
@@ -612,10 +664,11 @@ const MAX={num:15,maze:20,puz:8};
 /* ちずパズルの レベル：color=ピースの色のヒント name=名前を表示 rot=向きが回っている nob=県の境目なし card=名前カードだけ */
 const PZL=[null,{color:1,name:1},{name:1},{},{name:1,rot:1},{name:1,nob:1},{name:1,nob:1,rot:1},{card:1},{card:1,nob:1}];
 const CHIE_DEF=()=>({lv:{musubu:1,sagasu:1,mane:1,omosa:1,michi:1,shiri:1,moji:1},ok:{},bad:{}});
-let state={chie:CHIE_DEF(),limit:0,playDay:'',playSec:0,extra:0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
+let state={chie:CHIE_DEF(),eigo:{plays:{},solo:false},limit:0,playDay:'',playSec:0,extra:0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:true};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s){state=Object.assign(state,s);state.level=Object.assign({num:1,maze:1,puz:1},s.level);state.prog=Object.assign({num:0,maze:0,puz:0},s.prog);}}catch(e){}
 if(state.level.puz>8)state.level.puz=8;
 {const d=CHIE_DEF();const c=state.chie||{};state.chie=Object.assign(d,c);state.chie.lv=Object.assign(d.lv,c.lv||{});state.chie.ok=c.ok||{};state.chie.bad=c.bad||{};}
+state.eigo=Object.assign({plays:{},solo:false},state.eigo||{});
 /* 古い タブレットで でない えもじを おきかえ */
 state.stickers=(state.stickers||[]).map(x=>({'🪁':'🎏','🪀':'🎠'}[x]||x));
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
@@ -662,6 +715,7 @@ let current='home';
 function show(id){
   if(id!=='home'&&overLimit()){showRest();id='home';}
   if(id!=='chieplay')cStop();
+  if(id!=='eigoplay')egStop();
   current=id;
   document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!==id);
   refresh();
@@ -671,6 +725,8 @@ function show(id){
     if(id==='puzzle')newPuzzle();
     if(id==='chie'){renderHub();say('どれで あそぶ？');}
     if(id==='chieplay')chieBegin();
+    if(id==='eigo'){renderEigoHub();say('どの ばめんで あそぶ？');}
+    if(id==='eigoplay')eigoBegin();
   });
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b){try{speechSynthesis.cancel();}catch(_){}show(b.dataset.go);}});
@@ -1921,6 +1977,110 @@ CG.moji={name:'もじで いろぬり',icon:'🖍️',color:'#3D8FD6',max:5,prai
     cIdle(()=>say(L.txt?'もじと いろの なまえを よく みてね':talk),22000);
   }};
 
+/* ---------- えいご ごっこ：おうちの ひとと やくに なりきって えいごで はなす ---------- */
+let egVoice=null;
+function egPickVoice(){try{const vs=speechSynthesis.getVoices();egVoice=vs.find(v=>/^en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}catch(e){}}
+try{egPickVoice();speechSynthesis.addEventListener('voiceschanged',egPickVoice);}catch(e){}
+function sayEn(t,keep){if(!state.sound)return;try{if(!keep)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(egVoice)u.voice=egVoice;u.rate=0.82;u.pitch=1.1;speechSynthesis.speak(u);}catch(e){}}
+const EG_FRUIT=[['🍎','apple','apples','アップル','りんご'],['🍌','banana','bananas','バナーナ','バナナ'],['🍊','orange','oranges','オーレンジ','オレンジ'],['🍓','strawberry','strawberries','ストロベリー','いちご'],
+ ['🍇','grapes','grapes','グレイプス','ぶどう'],['🍈','melon','melons','メロン','メロン'],['🍑','peach','peaches','ピーチ','もも'],['🍋','lemon','lemons','レモン','レモン']];
+const EG_NUM=[null,['one','ワン'],['two','トゥー'],['three','スリー'],['four','フォー'],['five','ファイブ'],['six','シックス']];
+const EG_PLACE=[['🦁','the zoo','ザ ズー','どうぶつえん'],['🌳','the park','ザ パーク','こうえん'],['🏖️','the beach','ザ ビーチ','うみ'],['🗻','the mountain','ザ マウンテン','やま']];
+const EG_COL=[['#E5483B','red','レッド','あか'],['#3D7BE0','blue','ブルー','あお'],['#2FAE7E','green','グリーン','みどり'],['#F2C21B','yellow','イエロー','きいろ']];
+const EG_ANI=[['🐶','dogs','ドッグズ','いぬ'],['🐱','cats','キャッツ','ねこ'],['🐰','rabbits','ラビッツ','うさぎ'],['🐘','elephants','エレファンツ','ぞう'],['🦁','lions','ライオンズ','ライオン'],['🐵','monkeys','モンキーズ','おさる']];
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+/* ばめん：p＝あいて（おうちの ひと）、c＝こども。en・kana・ja は そのときの えらんだ もの（x）で かわる */
+const EG={
+ shop:{name:'おみせやさん',icon:'🛒',color:'#F2614B',p:['🐻','おみせの ひと'],build(){const x={},sh=shuffle(EG_FRUIT.slice()).slice(0,3);x.shelf=sh;return [
+  {by:'p',en:()=>'Hello!',kana:'ハロー',ja:'いらっしゃいませ'},
+  {by:'c',en:()=>'Hello!',kana:'ハロー',ja:'こんにちは'},
+  {by:'p',en:()=>'What do you want?',kana:'ワット ドゥ ユー ウォント？',ja:'なにが ほしいですか？'},
+  {by:'c',pick:{opts:()=>sh.map(f=>({e:f[0],w:f[4],v:f})),set:v=>x.f=v},en:()=>x.f?cap(x.f[1])+', please!':'＿, please!',slot:()=>x.f&&cap(x.f[1]),kana:()=>x.f?x.f[3]+' プリーズ':'〇〇 プリーズ',ja:()=>x.f?x.f[4]+'を ください':'〇〇を ください'},
+  {by:'p',en:()=>'How many?',kana:'ハウ メニー？',ja:'いくつ ほしい？'},
+  {by:'c',pick:{opts:()=>[1,2,3].map(n=>({e:x.f[0].repeat(n),w:n+'こ',v:n})),set:v=>x.n=v},en:()=>x.n?cap(EG_NUM[x.n][0])+', please!':'＿, please!',slot:()=>x.n&&cap(EG_NUM[x.n][0]),kana:()=>x.n?EG_NUM[x.n][1]+' プリーズ':'〇〇 プリーズ',ja:()=>x.n?x.n+'こ ください':'〇こ ください'},
+  {by:'p',en:()=>cap(EG_NUM[x.n][0])+' '+(x.n>1?x.f[2]:x.f[1])+'. Here you are.',kana:()=>EG_NUM[x.n][1]+' '+x.f[3]+'。ヒア ユー アー',ja:()=>x.f[4]+' '+x.n+'こ。はい どうぞ',give:()=>x.f[0].repeat(x.n)},
+  {by:'c',en:()=>'Thank you!',kana:'サンキュー',ja:'ありがとう'},
+  {by:'p',en:()=>'Bye-bye!',kana:'バイバイ',ja:'またね'},
+  {by:'c',en:()=>'Bye-bye!',kana:'バイバイ',ja:'またね'}];},
+  prop:x=>(x.shelf||[]).map(f=>f[0]).join(' ')},
+ train:{name:'えきで でんしゃ',icon:'🚃',color:'#3D7BE0',p:['🐵','えきいんさん'],build(){const x={},pl=shuffle(EG_PLACE.slice()).slice(0,3),cl=shuffle(EG_COL.slice()).slice(0,3);return [
+  {by:'p',en:()=>'Hello! Where are you going?',kana:'ハロー！ ウェア アー ユー ゴーイング？',ja:'こんにちは。どこへ いきますか？'},
+  {by:'c',pick:{opts:()=>pl.map(p=>({e:p[0],w:p[3],v:p})),set:v=>x.p=v},en:()=>x.p?'To '+x.p[1]+', please!':'To ＿, please!',slot:()=>x.p&&x.p[1],kana:()=>x.p?'トゥ '+x.p[2]+' プリーズ':'トゥ 〇〇 プリーズ',ja:()=>x.p?x.p[3]+'まで おねがいします':'〇〇まで おねがいします'},
+  {by:'p',en:()=>'OK! Which train?',kana:'オーケー！ ウィッチ トレイン？',ja:'わかりました。どの でんしゃに のる？'},
+  {by:'c',pick:{opts:()=>cl.map(c=>({train:c[0],w:c[3],v:c})),set:v=>x.c=v},en:()=>x.c?'The '+x.c[1]+' train, please!':'The ＿ train, please!',slot:()=>x.c&&x.c[1],kana:()=>x.c?'ザ '+x.c[2]+' トレイン プリーズ':'ザ 〇〇 トレイン プリーズ',ja:()=>x.c?x.c[3]+'の でんしゃに します':'〇〇の でんしゃに します'},
+  {by:'p',en:()=>'Here is your ticket. Have fun at '+x.p[1]+'!',kana:()=>'ヒア イズ ユア チケット。ハヴ ファン アット '+x.p[2]+'！',ja:()=>'きっぷです。'+x.p[3]+'、たのしんでね',give:()=>'🎫'},
+  {by:'c',en:()=>'Thank you!',kana:'サンキュー',ja:'ありがとう'},
+  {by:'p',en:()=>'Bye-bye!',kana:'バイバイ',ja:'いってらっしゃい'},
+  {by:'c',en:()=>'Bye-bye!',kana:'バイバイ',ja:'いってきます',go:()=>({col:x.c[0],to:x.p[0]})}];},
+  prop:()=>'🚉'},
+ friend:{name:'はじめまして',icon:'🐼',color:'#8A63D2',p:['🐼','パンダくん'],build(){const x={},fc=pick(EG_COL),ages=[3,4,5,6],cl=shuffle(EG_COL.slice()),an=shuffle(EG_ANI.slice()).slice(0,3),pa=pick(EG_ANI);return [
+  {by:'p',en:()=>'Hi! I\'m Panda.',kana:'ハイ！ アイム パンダ',ja:'こんにちは。パンダだよ'},
+  {by:'c',en:()=>'Hi, Panda!',kana:'ハイ パンダ',ja:'こんにちは、パンダくん'},
+  {by:'p',en:()=>'How old are you?',kana:'ハウ オールド アー ユー？',ja:'なんさい？'},
+  {by:'c',pick:{opts:()=>ages.map(n=>({e:'🎂',w:n+'さい',v:n})),set:v=>x.a=v},en:()=>x.a?'I\'m '+EG_NUM[x.a][0]+'!':'I\'m ＿!',slot:()=>x.a&&EG_NUM[x.a][0],kana:()=>x.a?'アイム '+EG_NUM[x.a][1]:'アイム 〇〇',ja:()=>x.a?x.a+'さいだよ':'〇さいだよ'},
+  {by:'p',en:()=>'What color do you like?',kana:'ワット カラー ドゥ ユー ライク？',ja:'なにいろが すき？'},
+  {by:'c',pick:{opts:()=>cl.map(c=>({sw:c[0],w:c[3],v:c})),set:v=>x.c=v},en:()=>x.c?'I like '+x.c[1]+'!':'I like ＿!',slot:()=>x.c&&x.c[1],kana:()=>x.c?'アイ ライク '+x.c[2]:'アイ ライク 〇〇',ja:()=>x.c?x.c[3]+'が すき':'〇〇が すき'},
+  /* こたえに あわせて へんじが かわる */
+  {by:'p',en:()=>x.c===fc?'Me too!':'Nice! I like '+fc[1]+'.',kana:()=>x.c===fc?'ミー トゥー！':'ナイス！ アイ ライク '+fc[2],ja:()=>x.c===fc?'ぼくも！':'いいね！ ぼくは '+fc[3]+'が すき'},
+  {by:'p',en:()=>'What animal do you like?',kana:'ワット アニマル ドゥ ユー ライク？',ja:'どんな どうぶつが すき？'},
+  {by:'c',pick:{opts:()=>an.map(a=>({e:a[0],w:a[3],v:a})),set:v=>x.n=v},en:()=>x.n?'I like '+x.n[1]+'!':'I like ＿!',slot:()=>x.n&&x.n[1],kana:()=>x.n?'アイ ライク '+x.n[2]:'アイ ライク 〇〇',ja:()=>x.n?x.n[3]+'が すき':'〇〇が すき'},
+  {by:'p',en:()=>x.n===pa?'Me too! Let\'s be friends!':'Cool! Let\'s be friends!',kana:()=>(x.n===pa?'ミー トゥー！':'クール！')+' レッツ ビー フレンズ',ja:()=>(x.n===pa?'ぼくも！':'すてき！')+' ともだちに なろう'},
+  {by:'c',en:()=>'OK!',kana:'オーケー',ja:'いいよ'}];},
+  prop:()=>''}};
+const EG_ORDER=['shop','train','friend'];
+let eg=null,egRec=null;const egT=[];
+function egLater(fn,ms){const s=eg;egT.push(setTimeout(()=>{if(eg===s&&current==='eigoplay')fn();},ms));}
+function egStop(){egT.forEach(clearTimeout);egT.length=0;if(egRec){try{egRec.stop();}catch(e){}}}
+function egSolo(){return !!(state.eigo&&state.eigo.solo);}
+function renderEigoHub(){const box=$('#egGrid');box.innerHTML='';
+  EG_ORDER.forEach((k,i)=>{const d=EG[k],b=H('button','ccard');b.style.setProperty('--cc',d.color);b.style.setProperty('--i',i);
+    b.innerHTML='<span class="cic">'+d.icon+'</span><b>'+d.name+'</b><small>'+((state.eigo.plays||{})[k]||0)+'かい あそんだ</small>';
+    b.onclick=()=>{try{speechSynthesis.cancel();}catch(_){}eg={k};show('eigoplay');};box.appendChild(b);});
+  const m=H('button','ccard cmix');m.style.setProperty('--cc','#24344D');m.style.setProperty('--i',3);
+  const paint=()=>{m.innerHTML='<span class="cic">'+(egSolo()?'🧒':'👪')+'</span><b>'+(egSolo()?'ひとりで':'おうちの ひとと')+'</b><small>タッチで きりかえ</small>';};paint();
+  m.onclick=()=>{state.eigo.solo=!egSolo();save();paint();say(egSolo()?'あいての セリフを タブレットが いうよ':'あいての セリフは おうちの ひとが いってね');};box.appendChild(m);}
+function egRecBtns(row){if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder))return;
+  const rb=H('button','egBtn rec','🎤 ろくおん'),pb=H('button','egBtn','▶ きく');pb.hidden=true;row.append(rb,pb);
+  rb.onclick=async()=>{if(egRec){egRec.stop();return;}try{speechSynthesis.cancel();}catch(_){}
+    try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const mr=new MediaRecorder(st),ch=[];mr.ondataavailable=e=>ch.push(e.data);
+      mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());if(egRec===mr)egRec=null;rb.classList.remove('on');rb.innerHTML='🎤 ろくおん';
+        const url=URL.createObjectURL(new Blob(ch,{type:mr.mimeType||'audio/webm'}));pb.hidden=false;pb.onclick=()=>{try{new Audio(url).play();}catch(_){}};try{new Audio(url).play();}catch(_){}};
+      mr.start();egRec=mr;rb.classList.add('on');rb.innerHTML='⏹ とめる';setTimeout(()=>{if(egRec===mr)mr.stop();},6000);}
+    catch(e){rb.hidden=true;toast('マイクが つかえないので、ろくおんは おやすみ');}};}
+function eigoBegin(){egStop();if(!eg||!EG[eg.k])eg={k:'shop'};const k=eg.k,S=EG[k];const steps=S.build();eg={k,steps,i:0,cued:false};
+  $('#egTitle').textContent=S.name;
+  const st=$('#egStage'),bt=$('#egBottom');st.innerHTML='';bt.innerHTML='';
+  const side=(who,name)=>{const d=H('div','egSide');d.innerHTML='<div class="egProp"></div><div class="egBub"><div class="egEn"></div><div class="egKana"></div><div class="egJa"></div></div><div class="egWho">'+who+'</div><div class="egName">'+name+'</div>';st.appendChild(d);return d;};
+  eg.P=side(S.p[0],S.p[1]);eg.C=side('🧒','きみ');eg.P.querySelector('.egProp').textContent=S.prop(eg)||'';
+  egStep();}
+function egDots(){const d=$('#egDots');d.innerHTML='';eg.steps.forEach((_,i)=>{const e=H('i',i<eg.i?'done':i===eg.i?'cur':'');d.appendChild(e);});}
+function egFill(sd,s){const v=f=>typeof f==='function'?f():f;let en=v(s.en);const sl=s.slot&&s.slot();
+  sd.querySelector('.egEn').innerHTML=sl?en.replace(sl,'<span class="egSlot">'+sl+'</span>'):en.replace('＿','<span class="egSlot">　?　</span>');
+  sd.querySelector('.egKana').textContent=v(s.kana);sd.querySelector('.egJa').textContent=v(s.ja);}
+function egStep(){const s=eg.steps[eg.i],bt=$('#egBottom');egDots();bt.innerHTML='';
+  const me=s.by==='p'?eg.P:eg.C,other=s.by==='p'?eg.C:eg.P;me.classList.add('on');other.classList.remove('on');egFill(me,s);
+  const line=()=>typeof s.en==='function'?s.en():s.en;
+  if(s.by==='p'){
+    if(s.give)egLater(()=>{eg.C.querySelector('.egProp').innerHTML=[...s.give()].filter(c=>c.trim()).length?'<span>'+s.give()+'</span>':'';},300);
+    const lb=H('button','egBtn','🔊 '+(egSolo()?'もういちど':'おてほん')),nx=H('button','egBtn go','つぎへ ▶');bt.append(lb,nx);
+    lb.onclick=()=>sayEn(line());nx.onclick=()=>{sfx.tick();egNext();};
+    if(egSolo())egLater(()=>sayEn(line()),350);else if(eg.i===0)say('おうちの ひとが ふきだしを よんでね');
+    return;}
+  const ready=()=>{bt.innerHTML='';const lb=H('button','egBtn','🔊 おてほん'),ok=H('button','egBtn go','⭕ いえた！');bt.append(lb);egRecBtns(bt);bt.appendChild(ok);
+    lb.onclick=()=>sayEn(line());ok.onclick=()=>{sfx.pop();cSpark(eg.C.querySelector('.egBub'),14);egNext();};
+    sayEn(line());if(!eg.cued){eg.cued=true;say('まねして いってみよう',true);}};
+  if(s.pick){say('どれに する？');s.pick.opts().forEach((o,i)=>{const b=H('button','egOpt');b.style.setProperty('--i',i);
+      b.innerHTML=(o.train?'<div class="train" style="background:'+o.train+'">🚃</div>':o.sw?'<div class="train" style="background:'+o.sw+';width:60%;height:50%;border-radius:50%"></div>':'<div class="e">'+o.e+'</div>')+'<div class="w">'+o.w+'</div>';
+      b.onclick=()=>{s.pick.set(o.v);sfx.snap();egFill(eg.C,s);ready();};bt.appendChild(b);});}
+  else ready();}
+function egNext(){const s=eg.steps[eg.i];eg.i++;
+  if(eg.i<eg.steps.length){egStep();return;}
+  egDots();eg.P.classList.remove('on');eg.C.classList.remove('on');$('#egBottom').innerHTML='';
+  state.eigo.plays=state.eigo.plays||{};state.eigo.plays[eg.k]=(state.eigo.plays[eg.k]||0)+1;
+  const g=s.go&&s.go();let d=200;
+  if(g){const a=H('div','egGo','<span style="display:inline-block;background:'+g.col+';border-radius:14px;padding:0 8px">🚃🚃</span> '+g.to);$('#egStage').appendChild(a);sfx.step(5);d=2600;}
+  egLater(()=>celebrate('えいごで おはなし できたね！','',()=>eigoBegin()),d);}
+
 /* ---------- おうちのかたへ ---------- */
 function paintParent(){
   {const box=$('#chieSegs');box.innerHTML='';CG_ORDER.forEach(g=>{const row=H('div','prow',CG[g].name);const seg=H('div','seg');
@@ -1941,7 +2101,7 @@ document.querySelectorAll('#limSeg button').forEach(b=>b.onclick=()=>{state.limi
 document.querySelectorAll('#sndSeg button').forEach(b=>b.onclick=()=>{state.sound=b.dataset.v==='1';save();paintParent();});
 $('#resetBtn').onclick=e=>{const b=e.currentTarget;
   if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='もう一度押すと全部消えます';setTimeout(()=>{b.dataset.armed='';b.textContent='記録をリセット';},4000);return;}
-  b.dataset.armed='';state={chie:CHIE_DEF(),limit:state.limit||0,home:state.home||'',playDay:state.playDay,playSec:state.playSec||0,extra:state.extra||0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:state.sound};save();refresh();paintParent();b.textContent='リセットしました';};
+  b.dataset.armed='';state={chie:CHIE_DEF(),eigo:{plays:{},solo:(state.eigo||{}).solo||false},limit:state.limit||0,home:state.home||'',playDay:state.playDay,playSec:state.playSec||0,extra:state.extra||0,mapDone:[],stars:0,stickers:[],level:{num:1,maze:1,puz:1},prog:{num:0,maze:0,puz:0},sound:state.sound};save();refresh();paintParent();b.textContent='リセットしました';};
 
 refresh();
 const fsEl=document.documentElement,fsReq=fsEl.requestFullscreen||fsEl.webkitRequestFullscreen;

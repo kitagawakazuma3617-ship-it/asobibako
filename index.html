@@ -496,6 +496,15 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
 @keyframes egGo{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 @media (orientation:portrait){.egStage{grid-template-columns:none;grid-template-rows:1fr 1fr}.egGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media (min-width:860px) and (orientation:landscape){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))!important}.tile b{font-size:clamp(20px,2.5vw,34px)!important}}
+.egProp.big{font-size:clamp(30px,6.4vmin,54px);max-width:100%}
+.egProp span{position:relative;display:inline-block}
+.egProp span.cnt{transform:scale(1.15)}
+.egProp span.cnt::after{content:attr(data-n);position:absolute;right:-6px;top:-8px;min-width:24px;height:24px;border-radius:12px;background:var(--sun);color:var(--ink);font-size:15px;font-weight:800;display:grid;place-items:center}
+.egNum{font-weight:800;color:var(--ink);font-family:Arial,sans-serif}
+.egVoice{margin:0 0 8px;text-align:center;font-size:13px;color:var(--soft)}
+.egGrid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media (orientation:portrait){.egGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.egGrid .ccard b{font-size:clamp(15px,1.9vw,22px)}.egGrid .ccard{padding:8px 6px}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -590,6 +599,7 @@ button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
     <div class="bar"><button class="homebtn" data-go="home" aria-label="おうちにもどる"><svg width="34" height="34" viewBox="0 0 24 24"><path fill="#2FAE7E" d="M12 3l9 8h-2.5v9h-5v-6h-3v6h-5v-9H3z"/></svg></button><h1>えいご ごっこ</h1><div class="stars"><span>★</span><span class="starN">0</span><span class="p3"><i></i><i></i><i></i></span></div></div>
     <p class="egNote">おうちの ひとと いっしょに、やくに なりきって えいごで おはなし しよう</p>
     <div class="cgrid egGrid" id="egGrid"></div>
+    <p class="egVoice" id="egVoiceInfo"></p>
   </section>
 
   <!-- EIGO PLAY -->
@@ -1978,13 +1988,21 @@ CG.moji={name:'もじで いろぬり',icon:'🖍️',color:'#3D8FD6',max:5,prai
   }};
 
 /* ---------- えいご ごっこ：おうちの ひとと やくに なりきって えいごで はなす ---------- */
-let egVoice=null;
-function egPickVoice(){try{const vs=speechSynthesis.getVoices();egVoice=vs.find(v=>/^en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}catch(e){}}
+let egVoice=null,egWarned=false;
+function egPickVoice(){try{const vs=speechSynthesis.getVoices()||[];egVoice=vs.find(v=>/^en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;}catch(e){}return egVoice;}
 try{egPickVoice();speechSynthesis.addEventListener('voiceschanged',egPickVoice);}catch(e){}
-function sayEn(t,keep){if(!state.sound)return;try{if(!keep)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(egVoice)u.voice=egVoice;u.rate=0.82;u.pitch=1.1;speechSynthesis.speak(u);}catch(e){}}
+/* えいごの こえが ない・でない ときは、カタカナを にほんごの こえで よむ */
+function egFallback(kana){if(!egWarned){egWarned=true;toast('えいごの よみあげ音声が つかえないので、カタカナで よみます');}if(kana)say(kana.replace(/〇/g,''),true);}
+function sayEn(t,keep,kana){if(!state.sound)return;try{if(!egVoice)egPickVoice();if(!keep)speechSynthesis.cancel();
+  const go=()=>{if(!egVoice){egFallback(kana);return;}const u=new SpeechSynthesisUtterance(t);u.voice=egVoice;u.lang=egVoice.lang;u.rate=.82;u.pitch=1.1;let st=false;
+    u.onstart=()=>{st=true;};u.onerror=()=>{if(!st){st=true;egFallback(kana);}};speechSynthesis.speak(u);
+    setTimeout(()=>{if(!st&&!speechSynthesis.speaking&&!speechSynthesis.pending){st=true;egFallback(kana);}},2000);};
+  /* とめた すぐあとに よむと こえが でない たんまつが あるので すこし まつ */
+  keep?go():setTimeout(go,120);}catch(e){egFallback(kana);}}
 const EG_FRUIT=[['🍎','apple','apples','アップル','りんご'],['🍌','banana','bananas','バナーナ','バナナ'],['🍊','orange','oranges','オーレンジ','オレンジ'],['🍓','strawberry','strawberries','ストロベリー','いちご'],
  ['🍇','grapes','grapes','グレイプス','ぶどう'],['🍈','melon','melons','メロン','メロン'],['🍑','peach','peaches','ピーチ','もも'],['🍋','lemon','lemons','レモン','レモン']];
-const EG_NUM=[null,['one','ワン'],['two','トゥー'],['three','スリー'],['four','フォー'],['five','ファイブ'],['six','シックス']];
+const EG_NUM=[null,['one','ワン'],['two','トゥー'],['three','スリー'],['four','フォー'],['five','ファイブ'],['six','シックス'],['seven','セブン'],['eight','エイト'],['nine','ナイン'],['ten','テン']];
+const EG_CNT=[['🍎','apples','アップルズ'],['🚃','trains','トレインズ'],['🦆','ducks','ダックス'],['⚽','balls','ボールズ'],['⭐','stars','スターズ'],['🚗','cars','カーズ'],['🐟','fish','フィッシュ'],['🎈','balloons','バルーンズ']];
 const EG_PLACE=[['🦁','the zoo','ザ ズー','どうぶつえん'],['🌳','the park','ザ パーク','こうえん'],['🏖️','the beach','ザ ビーチ','うみ'],['🗻','the mountain','ザ マウンテン','やま']];
 const EG_COL=[['#E5483B','red','レッド','あか'],['#3D7BE0','blue','ブルー','あお'],['#2FAE7E','green','グリーン','みどり'],['#F2C21B','yellow','イエロー','きいろ']];
 const EG_ANI=[['🐶','dogs','ドッグズ','いぬ'],['🐱','cats','キャッツ','ねこ'],['🐰','rabbits','ラビッツ','うさぎ'],['🐘','elephants','エレファンツ','ぞう'],['🦁','lions','ライオンズ','ライオン'],['🐵','monkeys','モンキーズ','おさる']];
@@ -2027,12 +2045,27 @@ const EG={
   {by:'p',en:()=>x.n===pa?'Me too! Let\'s be friends!':'Cool! Let\'s be friends!',kana:()=>(x.n===pa?'ミー トゥー！':'クール！')+' レッツ ビー フレンズ',ja:()=>(x.n===pa?'ぼくも！':'すてき！')+' ともだちに なろう'},
   {by:'c',en:()=>'OK!',kana:'オーケー',ja:'いいよ'}];},
   prop:()=>''}};
-const EG_ORDER=['shop','train','friend'];
+/* かずの れんしゅう：「How many?」に こたえる。まちがえたら いっしょに かぞえて、もういちど いう */
+EG.count={name:'いくつ あるかな',icon:'🔢',color:'#2FAE7E',p:['🐰','うさぎせんせい'],build(){const x={r:[]};const rg=[[1,5],[4,8],[6,10]],th=shuffle(EG_CNT.slice()).slice(0,3);const st=[
+  {by:'p',en:()=>'Let\'s count!',kana:'レッツ カウント',ja:'かぞえてみよう'},
+  {by:'c',en:()=>'OK!',kana:'オーケー',ja:'いいよ'}];
+  rg.forEach((g,ri)=>{const n=g[0]+rand(g[1]-g[0]+1),t=th[ri],R={n,t,pick:null};x.r.push(R);const w=v=>EG_NUM[v][0],k=v=>EG_NUM[v][1];
+   const opts=[n];for(const v of shuffle([n-2,n-1,n+1,n+2].filter(v=>v>=1&&v<=10)))if(opts.length<3)opts.push(v);opts.sort((a,b)=>a-b);
+   st.push({by:'p',en:()=>'How many '+t[1]+'?',kana:'ハウ メニー '+t[2]+'？',ja:'いくつ あるかな？',show:()=>t[0].repeat(n)},
+    {by:'c',pick:{opts:()=>opts.map(v=>({num:v,w:w(v),v})),set:v=>R.pick=v},en:()=>R.pick?cap(w(R.pick))+'!':'＿!',slot:()=>R.pick&&cap(w(R.pick)),kana:()=>R.pick?k(R.pick):'〇〇',ja:()=>R.pick?R.pick+'こ':'〇こ'},
+    /* あっていたら ほめる。ちがったら いっしょに かぞえる */
+    {by:'p',en:()=>R.pick===n?'That\'s right! '+cap(w(n))+' '+t[1]+'!':'Let\'s count together. '+range(1,n).map(w).join(', ')+'!',
+     kana:()=>R.pick===n?'ザッツ ライト！ '+k(n)+' '+t[2]:'レッツ カウント トゥゲザー。'+range(1,n).map(k).join(' '),ja:()=>R.pick===n?'せいかい！ '+n+'こ だね':'いっしょに かぞえよう',count:()=>R.pick!==n?n:0},
+    {by:'c',skip:()=>R.pick===n,en:()=>cap(w(n))+' '+t[1]+'!',kana:()=>k(n)+' '+t[2],ja:()=>n+'こ'});});
+  st.push({by:'p',en:()=>'Great counting!',kana:'グレイト カウンティング',ja:'かぞえるの じょうずだね'},{by:'c',en:()=>'Thank you!',kana:'サンキュー',ja:'ありがとう'});
+  return st;},prop:()=>''};
+const EG_ORDER=['shop','train','friend','count'];
 let eg=null,egRec=null;const egT=[];
 function egLater(fn,ms){const s=eg;egT.push(setTimeout(()=>{if(eg===s&&current==='eigoplay')fn();},ms));}
 function egStop(){egT.forEach(clearTimeout);egT.length=0;if(egRec){try{egRec.stop();}catch(e){}}}
 function egSolo(){return !!(state.eigo&&state.eigo.solo);}
 function renderEigoHub(){const box=$('#egGrid');box.innerHTML='';
+  const vi=$('#egVoiceInfo');if(vi){egPickVoice();vi.textContent=egVoice?'えいごの こえ：'+egVoice.name:'えいごの よみあげ音声が みつかりません（カタカナで よみます）';}
   EG_ORDER.forEach((k,i)=>{const d=EG[k],b=H('button','ccard');b.style.setProperty('--cc',d.color);b.style.setProperty('--i',i);
     b.innerHTML='<span class="cic">'+d.icon+'</span><b>'+d.name+'</b><small>'+((state.eigo.plays||{})[k]||0)+'かい あそんだ</small>';
     b.onclick=()=>{try{speechSynthesis.cancel();}catch(_){}eg={k};show('eigoplay');};box.appendChild(b);});
@@ -2059,22 +2092,26 @@ function egFill(sd,s){const v=f=>typeof f==='function'?f():f;let en=v(s.en);cons
   sd.querySelector('.egKana').textContent=v(s.kana);sd.querySelector('.egJa').textContent=v(s.ja);}
 function egStep(){const s=eg.steps[eg.i],bt=$('#egBottom');egDots();bt.innerHTML='';
   const me=s.by==='p'?eg.P:eg.C,other=s.by==='p'?eg.C:eg.P;me.classList.add('on');other.classList.remove('on');egFill(me,s);
-  const line=()=>typeof s.en==='function'?s.en():s.en;
+  if(s.skip&&s.skip()){eg.i++;if(eg.i<eg.steps.length)egStep();else egNext0();return;}
+  const line=()=>typeof s.en==='function'?s.en():s.en,kana=()=>typeof s.kana==='function'?s.kana():s.kana;
+  if(s.show){const pp=eg.P.querySelector('.egProp');pp.classList.add('big');pp.innerHTML=[...s.show()].filter(c=>c.trim()&&c!=='\ufe0f').map((c,i)=>'<span style="--i:'+i+'">'+c+'</span>').join('');}
+  if(s.count&&s.count()&&egSolo())sayEn("Let's count together!",false,'レッツ カウント トゥゲザー');
+  if(s.count&&s.count()){const sp=[...eg.P.querySelectorAll('.egProp span')];sp.forEach((e,i)=>egLater(()=>{e.classList.add('cnt');e.dataset.n=i+1;sfx.step(i+1);if(egSolo())sayEn(EG_NUM[i+1][0],true,EG_NUM[i+1][1]);},700+i*(egSolo()?750:950)));}
   if(s.by==='p'){
     if(s.give)egLater(()=>{eg.C.querySelector('.egProp').innerHTML=[...s.give()].filter(c=>c.trim()).length?'<span>'+s.give()+'</span>':'';},300);
     const lb=H('button','egBtn','🔊 '+(egSolo()?'もういちど':'おてほん')),nx=H('button','egBtn go','つぎへ ▶');bt.append(lb,nx);
-    lb.onclick=()=>sayEn(line());nx.onclick=()=>{sfx.tick();egNext();};
-    if(egSolo())egLater(()=>sayEn(line()),350);else if(eg.i===0)say('おうちの ひとが ふきだしを よんでね');
+    lb.onclick=()=>sayEn(line(),false,kana());nx.onclick=()=>{sfx.tick();egNext();};
+    if(egSolo()&&!(s.count&&s.count()))egLater(()=>sayEn(line(),false,kana()),350);else if(eg.i===0)say('おうちの ひとが ふきだしを よんでね');
     return;}
   const ready=()=>{bt.innerHTML='';const lb=H('button','egBtn','🔊 おてほん'),ok=H('button','egBtn go','⭕ いえた！');bt.append(lb);egRecBtns(bt);bt.appendChild(ok);
-    lb.onclick=()=>sayEn(line());ok.onclick=()=>{sfx.pop();cSpark(eg.C.querySelector('.egBub'),14);egNext();};
-    sayEn(line());if(!eg.cued){eg.cued=true;say('まねして いってみよう',true);}};
+    lb.onclick=()=>sayEn(line(),false,kana());ok.onclick=()=>{sfx.pop();cSpark(eg.C.querySelector('.egBub'),14);egNext();};
+    sayEn(line(),false,kana());if(!eg.cued){eg.cued=true;say('まねして いってみよう',true);}};
   if(s.pick){say('どれに する？');s.pick.opts().forEach((o,i)=>{const b=H('button','egOpt');b.style.setProperty('--i',i);
-      b.innerHTML=(o.train?'<div class="train" style="background:'+o.train+'">🚃</div>':o.sw?'<div class="train" style="background:'+o.sw+';width:60%;height:50%;border-radius:50%"></div>':'<div class="e">'+o.e+'</div>')+'<div class="w">'+o.w+'</div>';
+      b.innerHTML=(o.train?'<div class="train" style="background:'+o.train+'">🚃</div>':o.sw?'<div class="train" style="background:'+o.sw+';width:60%;height:50%;border-radius:50%"></div>':o.num?'<div class="e egNum">'+o.num+'</div>':'<div class="e">'+o.e+'</div>')+'<div class="w">'+o.w+'</div>';
       b.onclick=()=>{s.pick.set(o.v);sfx.snap();egFill(eg.C,s);ready();};bt.appendChild(b);});}
   else ready();}
-function egNext(){const s=eg.steps[eg.i];eg.i++;
-  if(eg.i<eg.steps.length){egStep();return;}
+function egNext(){eg.i++;if(eg.i<eg.steps.length){egStep();return;}egNext0();}
+function egNext0(){const s=eg.steps[eg.steps.length-1];
   egDots();eg.P.classList.remove('on');eg.C.classList.remove('on');$('#egBottom').innerHTML='';
   state.eigo.plays=state.eigo.plays||{};state.eigo.plays[eg.k]=(state.eigo.plays[eg.k]||0)+1;
   const g=s.go&&s.go();let d=200;
